@@ -58,7 +58,7 @@ node scripts/check-health.mjs
 docker compose up --build
 ```
 
-The compose stack uses pinned `supabase/postgres:15.8.1.060`, selected because it provides PostgreSQL 15 with PostGIS, pgvector, citext, and pgcrypto. Production PostgreSQL is hosted by Supabase; the application uses standard PostgreSQL connectivity through Kysely, never Supabase database APIs.
+`supabase/postgres:15.8.1.060` bootstraps through its required `supabase_admin` role, so the local Compose default and CI use that role. The application still connects through standard PostgreSQL URLs and Kysely, never Supabase database APIs.
 
 ```bash
 docker compose up -d database

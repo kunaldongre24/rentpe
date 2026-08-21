@@ -12,15 +12,15 @@ jobs:
         image: supabase/postgres:15.8.1.060
         env:
           POSTGRES_DB: property_assistant_test
-          POSTGRES_USER: postgres
+          POSTGRES_USER: supabase_admin
           POSTGRES_PASSWORD: postgres
         ports: ['5432:5432']
         options: >-
-          --health-cmd "pg_isready -U postgres -d property_assistant_test"
+          --health-cmd "pg_isready -U supabase_admin -d property_assistant_test"
           --health-interval 5s --health-timeout 5s --health-retries 20
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/property_assistant_test
-      MIGRATION_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/property_assistant_test
+      DATABASE_URL: postgresql://supabase_admin:postgres@localhost:5432/property_assistant_test
+      MIGRATION_DATABASE_URL: postgresql://supabase_admin:postgres@localhost:5432/property_assistant_test
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

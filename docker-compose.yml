@@ -3,7 +3,7 @@ services:
     image: supabase/postgres:15.8.1.060
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-property_assistant}
-      POSTGRES_USER: ${POSTGRES_USER:-property_assistant}
+      POSTGRES_USER: ${POSTGRES_USER:-supabase_admin}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-property_assistant_dev}
     ports: ['5432:5432']
     volumes: [property_assistant_database:/var/lib/postgresql/data]
@@ -21,7 +21,7 @@ services:
     env_file: .env
     environment:
       {
-        DATABASE_URL: 'postgresql://${POSTGRES_USER:-property_assistant}:${POSTGRES_PASSWORD:-property_assistant_dev}@database:5432/${POSTGRES_DB:-property_assistant}',
+        DATABASE_URL: 'postgresql://${POSTGRES_USER:-supabase_admin}:${POSTGRES_PASSWORD:-property_assistant_dev}@database:5432/${POSTGRES_DB:-property_assistant}',
       }
     ports: ['3001:3001']
     depends_on:
