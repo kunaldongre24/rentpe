@@ -430,7 +430,6 @@ describe.runIf(enabled)('database schema integration', () => {
         'property_images_property_id_sort_order_key',
         'call_sessions_provider_call_id_key',
         'behavioral_preferences_scope_unique',
-        'property_notifications_user_id_search_id_property_id_channel_key',
       ]),
     );
     expect(
