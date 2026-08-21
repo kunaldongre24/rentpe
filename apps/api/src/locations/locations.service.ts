@@ -1,11 +1,9 @@
-import { NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type {
   LocationCreate,
   LocationUpdate,
   Pagination,
 } from '@property-assistant/types';
-// Nest uses the runtime class token for constructor injection.
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { DatabaseService } from '../database/database.service.js';
 
 function normalizedName(value: string): string {
@@ -15,6 +13,7 @@ function normalizedName(value: string): string {
     .replace(/[^a-z0-9]+/g, '-');
 }
 
+@Injectable()
 export class LocationsService {
   constructor(private readonly database: DatabaseService) {}
 

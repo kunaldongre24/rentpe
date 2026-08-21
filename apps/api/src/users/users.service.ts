@@ -1,6 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
-// Nest uses the runtime class token for constructor injection.
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service.js';
 import type {
   Pagination,
@@ -8,6 +6,7 @@ import type {
   UserUpdate,
 } from '@property-assistant/types';
 
+@Injectable()
 export class UsersService {
   constructor(private readonly database: DatabaseService) {}
 
