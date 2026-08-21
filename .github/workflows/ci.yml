@@ -1,0 +1,67 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: supabase/postgres:15.8.1.060
+        env:
+          POSTGRES_DB: property_assistant_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d property_assistant_test"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/property_assistant_test
+      MIGRATION_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/property_assistant_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.15.0 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Apply migrations
+        run: pnpm db:migrate
+      - name: Assert migrations are idempotent
+        run: pnpm db:migrate
+      - name: Seed deterministic development data
+        run: pnpm db:seed
+        env:
+          SEED_EXPECTED_MODE: initial
+      - name: Assert unchanged seed records are skipped
+        run: pnpm db:seed
+        env:
+          SEED_EXPECTED_MODE: idempotent
+      - name: Verify PostgreSQL version, extensions, and final seed counts
+        run: pnpm db:verify
+      - name: Assert production migration commands require MIGRATION_DATABASE_URL
+        run: |
+          if NODE_ENV=production MIGRATION_DATABASE_URL= pnpm db:status; then
+            echo "Production migration command unexpectedly accepted DATABASE_URL fallback"
+            exit 1
+          fi
+      - name: Report migration status
+        run: pnpm db:status
+      - name: Run live database catalog and integration tests
+        run: pnpm --filter @property-assistant/database test
+      - name: Lint
+        run: pnpm lint
+      - name: Check formatting
+        run: pnpm format:check
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Run remaining unit tests
+        run: pnpm --filter '!@property-assistant/database' -r test
+      - name: Build production artifacts
+        run: pnpm build

@@ -1,0 +1,37 @@
+{
+  "name": "property-assistant-india",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.15.0",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "corepack pnpm -r build",
+    "dev": "corepack pnpm --parallel --filter @property-assistant/api --filter @property-assistant/web --filter @property-assistant/voice-agent dev",
+    "dev:api": "corepack pnpm --filter @property-assistant/api dev",
+    "dev:web": "corepack pnpm --filter @property-assistant/web dev",
+    "dev:voice": "corepack pnpm --filter @property-assistant/voice-agent dev",
+    "db:migrate": "corepack pnpm --filter @property-assistant/database db:migrate",
+    "db:reset": "corepack pnpm --filter @property-assistant/database db:reset",
+    "db:seed": "corepack pnpm --filter @property-assistant/database db:seed",
+    "db:status": "corepack pnpm --filter @property-assistant/database db:status",
+    "db:verify": "corepack pnpm --filter @property-assistant/database db:verify",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . --max-warnings=0",
+    "test": "corepack pnpm -r test",
+    "typecheck": "corepack pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "eslint": "^9.34.0",
+    "eslint-config-prettier": "^10.1.8",
+    "@next/eslint-plugin-next": "^15.5.2",
+    "globals": "^16.3.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.41.0"
+  }
+}
