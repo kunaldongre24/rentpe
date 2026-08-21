@@ -10,7 +10,7 @@ type DatabaseExtensionValue = object;
 
 interface Timestamps {
   created_at: Generated<Timestamp>;
-  updated_at: Generated<Timestamp>;
+  updated_at: Timestamp;
 }
 export interface UsersTable extends Timestamps {
   id: Generated<string>;
@@ -31,7 +31,7 @@ export interface LocationsTable extends Timestamps {
   aliases: Json;
   latitude: Numeric;
   longitude: Numeric;
-  location: unknown;
+  location: Generated<unknown>;
 }
 export interface BrokersTable extends Timestamps {
   id: Generated<string>;
@@ -67,7 +67,7 @@ export interface PropertySearchesTable extends Timestamps {
   available_from: string | null;
   latitude: Numeric | null;
   longitude: Numeric | null;
-  location: DatabaseExtensionValue | null;
+  location: Generated<DatabaseExtensionValue> | null;
   search_radius_meters: number | null;
   expires_at: Timestamp | null;
 }
@@ -108,7 +108,7 @@ export interface PropertiesTable extends Timestamps {
   city: string;
   latitude: Numeric;
   longitude: Numeric;
-  location: DatabaseExtensionValue;
+  location: Generated<DatabaseExtensionValue>;
   available_from: string;
   status: string;
   quality_score: Numeric;

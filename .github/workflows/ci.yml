@@ -55,6 +55,8 @@ jobs:
         run: pnpm db:status
       - name: Run live database catalog and integration tests
         run: pnpm --filter @property-assistant/database test
+      - name: Run API CRUD integration tests
+        run: pnpm --filter @property-assistant/api test
       - name: Lint
         run: pnpm lint
       - name: Check formatting
@@ -62,6 +64,6 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
       - name: Run remaining unit tests
-        run: pnpm --filter '!@property-assistant/database' -r test
+        run: pnpm --filter '!@property-assistant/database' --filter '!@property-assistant/api' -r test
       - name: Build production artifacts
         run: pnpm build

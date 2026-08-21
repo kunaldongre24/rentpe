@@ -83,9 +83,20 @@ The Google Cloud-hosted backend uses `DATABASE_URL` to connect directly to Supab
 
 GitHub Actions starts the pinned `supabase/postgres:15.8.1.060` image, runs migrations twice, runs the deterministic seed twice with explicit initial/idempotent statistic assertions, validates final counts and PostgreSQL 15/extensions, executes the live catalog integration suite, then runs lint, formatting, typechecking, remaining unit tests, and production builds. This workflow is the authoritative Phase 2 database verification. Phase 2 remains verification-pending until that workflow succeeds; local static checks alone do not complete the phase.
 
-## Future Phase Boundaries
+## CRUD API (Phase 3)
 
-Phase 3 may add CRUD only after explicit approval. Phase 2 exposes no property, broker, user, or search business APIs and implements no spatial search, vector search, matching, AI, voice, WhatsApp, or jobs.
+Phase 3 exposes foundational CRUD only through NestJS and Kysely. It does not implement search, matching, authentication, AI, telephony, LiveKit, WhatsApp, notifications, personalization, vector retrieval, or the admin dashboard.
+
+Resources:
+
+- `GET|POST /api/users`, `GET|PATCH|DELETE /api/users/:id`
+- `GET|POST /api/locations`, `GET|PATCH|DELETE /api/locations/:id`
+- `GET|POST /api/brokers`, `GET|PATCH|DELETE /api/brokers/:id`
+- `GET|POST /api/properties`, `GET|PATCH|DELETE /api/properties/:id`
+
+Collection endpoints accept `limit` (1–100, default 20) and `offset` (default 0). Request bodies are validated with the shared Zod contracts in `packages/types`. Phone values must be E.164 at the application boundary. Property deletion is a soft delete (`status=DELETED`) so historical references remain safe.
+
+The CRUD integration suite runs only when `DATABASE_URL` is configured; CI runs it after migrations and seed setup against the pinned PostgreSQL service.
 
 ## Troubleshooting
 

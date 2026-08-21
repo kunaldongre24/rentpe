@@ -56,12 +56,18 @@ importers:
       '@property-assistant/types':
         specifier: workspace:*
         version: link:../../packages/types
+      kysely:
+        specifier: ^0.28.5
+        version: 0.28.17
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
       rxjs:
         specifier: ^7.8.2
         version: 7.8.2
+      zod:
+        specifier: ^4.1.5
+        version: 4.4.3
     devDependencies:
       '@nestjs/cli':
         specifier: ^11.0.10
@@ -174,6 +180,10 @@ importers:
         version: 3.2.7(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.50.0)(tsx@4.23.12)
 
   packages/types:
+    dependencies:
+      zod:
+        specifier: ^4.1.5
+        version: 4.4.3
     devDependencies:
       vitest:
         specifier: ^3.2.4
