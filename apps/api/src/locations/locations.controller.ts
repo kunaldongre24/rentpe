@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Patch,
   Post,
@@ -19,7 +20,9 @@ import { LocationsService } from './locations.service.js';
 
 @Controller('locations')
 export class LocationsController {
-  constructor(private readonly locations: LocationsService) {}
+  constructor(
+    @Inject(LocationsService) private readonly locations: LocationsService,
+  ) {}
 
   @Get()
   list(@Query() query: unknown) {

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Patch,
   Post,
@@ -19,7 +20,9 @@ import { BrokersService } from './brokers.service.js';
 
 @Controller('brokers')
 export class BrokersController {
-  constructor(private readonly brokers: BrokersService) {}
+  constructor(
+    @Inject(BrokersService) private readonly brokers: BrokersService,
+  ) {}
 
   @Get()
   list(@Query() query: unknown) {

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Patch,
   Post,
@@ -19,7 +20,9 @@ import { PropertiesService } from './properties.service.js';
 
 @Controller('properties')
 export class PropertiesController {
-  constructor(private readonly properties: PropertiesService) {}
+  constructor(
+    @Inject(PropertiesService) private readonly properties: PropertiesService,
+  ) {}
 
   @Get()
   list(@Query() query: unknown) {
