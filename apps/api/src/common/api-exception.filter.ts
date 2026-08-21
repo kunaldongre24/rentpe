@@ -1,7 +1,9 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
 
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(ApiExceptionFilter.name);
+
   catch(error: unknown, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse<{
       status(code: number): { json(body: unknown): void };
@@ -29,6 +31,11 @@ export class ApiExceptionFilter implements ExceptionFilter {
       });
       return;
     }
+    this.logger.error(
+      error instanceof Error
+        ? `${error.name}: ${error.message}`
+        : 'Unknown non-Error exception',
+    );
     response.status(500).json({
       statusCode: 500,
       message: 'Internal server error',
