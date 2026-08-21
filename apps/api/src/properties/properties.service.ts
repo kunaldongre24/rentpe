@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type {
   Pagination,
   PropertyCreate,
@@ -8,7 +8,9 @@ import { DatabaseService } from '../database/database.service.js';
 
 @Injectable()
 export class PropertiesService {
-  constructor(private readonly database: DatabaseService) {}
+  constructor(
+    @Inject(DatabaseService) private readonly database: DatabaseService,
+  ) {}
 
   async list(pagination: Pagination) {
     return this.database.client
