@@ -1,4 +1,5 @@
 import { z } from 'zod';
+export * from './ai.js';
 export * from './feedback.js';
 export * from './notifications.js';
 export * from './whatsapp.js';

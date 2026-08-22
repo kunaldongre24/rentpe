@@ -47,6 +47,9 @@ importers:
       '@nestjs/platform-express':
         specifier: ^11.1.6
         version: 11.2.1(@nestjs/common@11.2.1(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.1)
+      '@property-assistant/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
       '@property-assistant/config':
         specifier: workspace:*
         version: link:../../packages/config
@@ -145,6 +148,10 @@ importers:
         version: 3.2.7(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.50.0)(tsx@4.23.12)
 
   packages/ai:
+    dependencies:
+      '@property-assistant/types':
+        specifier: workspace:*
+        version: link:../types
     devDependencies:
       vitest:
         specifier: ^3.2.4
