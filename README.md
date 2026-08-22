@@ -1,19 +1,29 @@
 # AI Property Receptionist and Property Discovery
 
-Phase 2 foundation for a phone and WhatsApp-first rental property discovery platform for India. It includes PostgreSQL schema infrastructure only; product workflows, AI, telephony, messaging, CRUD, and search remain excluded.
+ProjectX is a phone-first rental property discovery platform for India. The repository contains staged application foundations and verified phase implementations; external telephony and AI provider connections remain account/configuration dependent.
+
+## Telephony Architecture
+
+ProjectX uses Vobiz as the telephony/SIP provider and LiveKit as the only voice-agent runtime. See [`docs/telephony-vobiz.md`](docs/telephony-vobiz.md) for the SIP flow, provider boundaries, configuration placeholders, session isolation, concurrency target, and onboarding checklist.
+
+```text
+Caller -> Vobiz Indian DID/SIP -> LiveKit SIP -> LiveKit Agent -> NestJS tools -> Supabase
+```
+
+Vobiz account-specific DID availability, KYC, SIP termination, webhook fields, pricing, region, and concurrency must be confirmed before production. No Vobiz credentials are committed or claimed as configured.
 
 ## Architecture
 
 - `apps/api`: NestJS business backend foundation with `GET /api/health`.
 - `apps/web`: Next.js App Router admin shell with Tailwind CSS.
-- `apps/voice-agent`: LiveKit-oriented process boundary and interfaces only. It does not handle calls or audio yet.
-- `packages/config`: Strict environment parsing.
+- `apps/voice-agent`: LiveKit voice-runtime boundary with Vobiz telephony adapter contracts. It does not connect to external providers in local development.
+- `packages/config`: Strict environment parsing, including optional Vobiz configuration status.
 - `packages/types`: Shared transport types.
 - `packages/ai`: Reserved AI package boundary; no provider integration.
 - `packages/database`: Kysely, PostgreSQL pool, ordered migrations, schema types, catalog-level integration tests, and deterministic transactional seeds.
 - `infra/docker`: Application Dockerfiles. Phase 1 does not run PostgreSQL or external providers.
 
-The intended architecture is a modular monolith: NestJS will own persistent business logic, while the future LiveKit Agent will own real-time media and call orchestration and communicate through authenticated backend tools.
+The intended architecture is a modular monolith: Vobiz provides telephony/SIP only, LiveKit owns the real-time voice runtime, NestJS owns business logic and authenticated tools, and Supabase PostgreSQL remains the database. See [`docs/telephony-vobiz.md`](docs/telephony-vobiz.md).
 
 ## Prerequisites
 
@@ -28,7 +38,7 @@ cp .env.example .env
 corepack pnpm install
 ```
 
-Set `INTERNAL_API_TOKEN` to a development value of at least 16 characters. Remaining blank provider variables are reserved for later phases and are not consumed.
+Set `INTERNAL_API_TOKEN` to a development value of at least 16 characters. Vobiz and LiveKit credentials are optional for local development and are never logged. The local voice process exposes boundaries only; it does not connect to Vobiz or LiveKit.
 
 ## Development
 
@@ -39,7 +49,7 @@ corepack pnpm dev:web
 corepack pnpm dev:voice
 ```
 
-The voice-agent command starts only its foundation health process. It does not connect to LiveKit.
+The voice-agent command starts only its foundation health process. It does not connect to Vobiz, LiveKit SIP, or external AI providers.
 
 ## Verification
 
@@ -77,7 +87,9 @@ corepack pnpm db:status
 
 ## Environment
 
-The Google Cloud-hosted backend uses `DATABASE_URL` to connect directly to Supabase PostgreSQL. Deployment tooling uses the direct/session-mode `MIGRATION_DATABASE_URL`. Pool size and timeouts are configurable in `.env.example`. Never commit `.env` or credentials.
+- `VOBIZ_ACCOUNT_ID`, `VOBIZ_DID`, `VOBIZ_SIP_HOST`, `VOBIZ_SIP_PORT`, `VOBIZ_SIP_TRANSPORT`, `VOBIZ_SIP_USERNAME`, and `VOBIZ_SIP_PASSWORD` are account-specific telephony placeholders.
+- `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, and `LIVEKIT_SIP_URI` are LiveKit placeholders.
+- Do not add unapproved telephony provider credentials. Do not commit provider secrets.
 
 ## CI
 
