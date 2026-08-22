@@ -15,6 +15,6 @@ import { LocalWhatsAppProvider } from './whatsapp.provider.js';
     WhatsAppDeliveryService,
     { provide: WHATSAPP_PROVIDER, useClass: LocalWhatsAppProvider },
   ],
-  exports: [WhatsAppDeliveryService],
+  exports: [WhatsAppDeliveryService, WHATSAPP_PROVIDER],
 })
 export class WhatsAppModule {}

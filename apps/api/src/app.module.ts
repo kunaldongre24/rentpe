@@ -6,6 +6,7 @@ import { ApiExceptionFilter } from './common/api-exception.filter.js';
 import { DatabaseModule } from './database/database.module.js';
 import { HealthModule } from './health/health.module.js';
 import { LocationsModule } from './locations/locations.module.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
 import { PropertiesModule } from './properties/properties.module.js';
 import { RequirementsModule } from './requirements/requirements.module.js';
 import { UsersModule } from './users/users.module.js';
@@ -22,6 +23,7 @@ import { WhatsAppModule } from './whatsapp/whatsapp.module.js';
     LocationsModule,
     BrokersModule,
     PropertiesModule,
+    NotificationsModule,
     RequirementsModule,
     HealthModule,
   ],
