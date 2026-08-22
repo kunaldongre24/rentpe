@@ -8,5 +8,6 @@ import { RequirementsService } from './requirements.service.js';
   imports: [DatabaseModule],
   controllers: [RequirementsController],
   providers: [RequirementsService, LocationResolutionService],
+  exports: [RequirementsService, LocationResolutionService],
 })
 export class RequirementsModule {}

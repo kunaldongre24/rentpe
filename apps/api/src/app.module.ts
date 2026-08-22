@@ -9,12 +9,14 @@ import { LocationsModule } from './locations/locations.module.js';
 import { PropertiesModule } from './properties/properties.module.js';
 import { RequirementsModule } from './requirements/requirements.module.js';
 import { UsersModule } from './users/users.module.js';
+import { VoiceModule } from './voice/voice.module.js';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
     UsersModule,
+    VoiceModule,
     LocationsModule,
     BrokersModule,
     PropertiesModule,
