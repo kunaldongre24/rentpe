@@ -10,6 +10,7 @@ import { PropertiesModule } from './properties/properties.module.js';
 import { RequirementsModule } from './requirements/requirements.module.js';
 import { UsersModule } from './users/users.module.js';
 import { VoiceModule } from './voice/voice.module.js';
+import { WhatsAppModule } from './whatsapp/whatsapp.module.js';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { VoiceModule } from './voice/voice.module.js';
     DatabaseModule,
     UsersModule,
     VoiceModule,
+    WhatsAppModule,
     LocationsModule,
     BrokersModule,
     PropertiesModule,
