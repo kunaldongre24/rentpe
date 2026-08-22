@@ -1,6 +1,8 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { sql } from 'kysely';
+import { propertySearchWeights } from '@property-assistant/config';
 import type { PropertySearchQuery } from '@property-assistant/types';
+import { rankProperties } from './matching.js';
 import { DatabaseService } from '../database/database.service.js';
 
 @Injectable()
@@ -66,9 +68,14 @@ export class PropertySearchService {
 
     const rows = await properties
       .orderBy('created_at', 'desc')
-      .limit(query.limit)
-      .offset(query.offset)
+      .limit(1000)
       .execute();
-    return { search, properties: rows };
+    const ranked = rankProperties(search, rows, propertySearchWeights);
+    return {
+      search,
+      properties: ranked
+        .slice(query.offset, query.offset + query.limit)
+        .map(({ property, ...match }) => ({ ...property, ...match })),
+    };
   }
 }

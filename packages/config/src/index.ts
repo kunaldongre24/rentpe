@@ -1,5 +1,25 @@
 import { z } from 'zod';
 
+export interface PropertySearchWeights {
+  location: number;
+  rent: number;
+  bhk: number;
+  availability: number;
+  furnishing: number;
+  amenities: number;
+  quality: number;
+}
+
+export const propertySearchWeights: PropertySearchWeights = Object.freeze({
+  location: 30,
+  rent: 25,
+  bhk: 15,
+  availability: 10,
+  furnishing: 10,
+  amenities: 5,
+  quality: 5,
+});
+
 export const baseEnvironmentSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'test', 'production'])
