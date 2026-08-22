@@ -4,7 +4,10 @@ import { getVoiceAgentHealth } from './app.js';
 
 const environment = parseVoiceAgentEnvironment(process.env);
 const server = createServer((request, response) => {
-  if (request.method === 'GET' && request.url === '/health') {
+  if (
+    request.method === 'GET' &&
+    (request.url === '/health' || request.url === '/ready')
+  ) {
     response.writeHead(200, { 'content-type': 'application/json' });
     response.end(JSON.stringify(getVoiceAgentHealth()));
     return;
@@ -17,3 +20,18 @@ server.listen(environment.VOICE_AGENT_PORT, '0.0.0.0', () => {
     `Voice-agent foundation listening on ${environment.VOICE_AGENT_PORT}`,
   );
 });
+
+const shutdown = (signal: string) => {
+  console.log(`Voice-agent received ${signal}; shutting down`);
+  server.close((error) => {
+    if (error) {
+      console.error('Voice-agent shutdown failed');
+      process.exitCode = 1;
+      return;
+    }
+    process.exit(0);
+  });
+};
+
+process.once('SIGTERM', () => shutdown('SIGTERM'));
+process.once('SIGINT', () => shutdown('SIGINT'));

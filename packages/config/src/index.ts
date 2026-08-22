@@ -39,11 +39,26 @@ export const apiEnvironmentSchema = baseEnvironmentSchema.extend({
     .default(5_000),
 });
 
-export const voiceAgentEnvironmentSchema = baseEnvironmentSchema.extend({
-  VOICE_AGENT_PORT: z.coerce.number().int().positive().default(3002),
-  INTERNAL_API_URL: z.url().default('http://localhost:3001'),
-  INTERNAL_API_TOKEN: z.string().min(16),
-});
+export const voiceAgentEnvironmentSchema = baseEnvironmentSchema
+  .extend({
+    VOICE_AGENT_PORT: z.coerce.number().int().positive().default(3002),
+    INTERNAL_API_URL: z.url().default('http://localhost:3001'),
+    INTERNAL_API_TOKEN: z.string().min(16),
+  })
+  .superRefine((value, context) => {
+    if (
+      value.NODE_ENV === 'production' &&
+      (value.INTERNAL_API_TOKEN ===
+        'replace-with-a-long-random-development-token' ||
+        value.INTERNAL_API_TOKEN.length < 32)
+    )
+      context.addIssue({
+        code: 'custom',
+        path: ['INTERNAL_API_TOKEN'],
+        message:
+          'A random production internal token of at least 32 characters is required',
+      });
+  });
 
 export function parseApiEnvironment(environment: NodeJS.ProcessEnv) {
   return apiEnvironmentSchema.parse(environment);

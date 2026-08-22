@@ -8,4 +8,10 @@ describe('voice-agent foundation', () => {
       status: 'ok',
     });
   });
+
+  it('uses a stable health payload for readiness checks', () => {
+    const health = getVoiceAgentHealth();
+    expect(health.version).toBe('0.1.0');
+    expect(health.timestamp).toEqual(expect.any(String));
+  });
 });
