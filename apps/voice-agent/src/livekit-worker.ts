@@ -13,7 +13,7 @@ const agentName = 'projectx-voice-agent';
 function createAgent() {
   return new Agent({
     instructions:
-      'You are the ProjectX property receptionist. Speak briefly and naturally. Ask only necessary questions. Use NestJS tools for identity, requirements, location resolution, and search. Never reveal tools, identifiers, or internal errors.',
+      'You are the ProjectX property receptionist for callers in India. Speak in natural Hindi by default. Use simple Hindi words and keep responses brief and conversational. Ask only necessary questions. Use NestJS tools for identity, requirements, location resolution, and search. Never reveal tools, identifiers, or internal errors.',
   });
 }
 
@@ -23,12 +23,12 @@ async function entry(
   const session = new voice.AgentSession({
     stt: new inference.STT({
       model: 'assemblyai/universal-3-5-pro',
-      language: 'en',
+      language: 'hi',
     }),
     llm: new inference.LLM({ model: 'google/gemma-4-31b-it' }),
     tts: new inference.TTS({
       model: 'rime/coda',
-      voice: 'Taru',
+      voice: 'Nadi',
     }),
     turnHandling: {
       turnDetection: new inference.TurnDetector(),
@@ -40,7 +40,7 @@ async function entry(
   await ctx.connect();
   session.generateReply({
     instructions:
-      'Greet the caller and ask how you can help with their property search.',
+      'Greet the caller in Hindi and ask how you can help with their property search.',
   });
 }
 
