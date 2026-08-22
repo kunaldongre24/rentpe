@@ -11,7 +11,8 @@ export const WHATSAPP_PROVIDER = Symbol('WHATSAPP_PROVIDER');
 @Injectable()
 export class WhatsAppDeliveryService {
   constructor(
-    private readonly database: DatabaseService,
+    @Inject(DatabaseService) private readonly database: DatabaseService,
+    @Inject(PropertySearchService)
     private readonly search: PropertySearchService,
     @Inject(WHATSAPP_PROVIDER) private readonly provider: WhatsAppProvider,
   ) {}
