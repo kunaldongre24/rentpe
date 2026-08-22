@@ -2,8 +2,8 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { sql } from 'kysely';
 import { propertySearchWeights } from '@property-assistant/config';
 import type { PropertySearchQuery } from '@property-assistant/types';
-import { rankProperties } from './matching.js';
 import { DatabaseService } from '../database/database.service.js';
+import { rankProperties } from './matching.js';
 
 @Injectable()
 export class PropertySearchService {
@@ -18,6 +18,17 @@ export class PropertySearchService {
       .where('id', '=', searchId)
       .executeTakeFirst();
     if (!search) throw new NotFoundException('Search not found');
+
+    const behavioralRows = await this.database.client
+      .selectFrom('behavioral_preferences')
+      .select(['preference_key', 'value'])
+      .where('user_id', '=', search.user_id)
+      .where('search_id', '=', searchId)
+      .execute();
+    const behavioralPreferences = behavioralRows.map((row) => ({
+      key: row.preference_key,
+      value: row.value,
+    }));
 
     let properties = this.database.client
       .selectFrom('properties')
@@ -56,11 +67,7 @@ export class PropertySearchService {
       (search.longitude == null ? undefined : Number(search.longitude));
     if (latitude != null && longitude != null) {
       properties = properties.where(
-        sql<boolean>`ST_DWithin(
-          properties.location,
-          ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography,
-          ${query.radiusMeters}
-        )`,
+        sql<boolean>`ST_DWithin(properties.location, ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography, ${query.radiusMeters})`,
         '=',
         true,
       );
@@ -70,7 +77,12 @@ export class PropertySearchService {
       .orderBy('created_at', 'desc')
       .limit(1000)
       .execute();
-    const ranked = rankProperties(search, rows, propertySearchWeights);
+    const ranked = rankProperties(
+      search,
+      rows,
+      propertySearchWeights,
+      behavioralPreferences,
+    );
     return {
       search,
       properties: ranked

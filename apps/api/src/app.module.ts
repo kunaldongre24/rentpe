@@ -4,6 +4,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { BrokersModule } from './brokers/brokers.module.js';
 import { ApiExceptionFilter } from './common/api-exception.filter.js';
 import { DatabaseModule } from './database/database.module.js';
+import { FeedbackModule } from './feedback/feedback.module.js';
 import { HealthModule } from './health/health.module.js';
 import { LocationsModule } from './locations/locations.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
@@ -25,6 +26,7 @@ import { WhatsAppModule } from './whatsapp/whatsapp.module.js';
     PropertiesModule,
     NotificationsModule,
     RequirementsModule,
+    FeedbackModule,
     HealthModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ApiExceptionFilter }],

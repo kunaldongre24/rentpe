@@ -20,6 +20,12 @@ export interface MatchingProperty {
   furnishing: string;
   quality_score: string | number;
   freshness_score: string | number;
+  area?: string | number;
+}
+
+export interface BehavioralPreference {
+  key: string;
+  value: unknown;
 }
 
 export interface MatchResult<T extends MatchingProperty> {
@@ -34,11 +40,6 @@ function closeness(value: number, target: number): number {
     0,
     Math.min(100, 100 - (Math.abs(value - target) / target) * 100),
   );
-}
-
-function dateScore(propertyDate: string, desiredDate: string | null): number {
-  if (!desiredDate) return 100;
-  return propertyDate >= desiredDate ? 100 : 0;
 }
 
 function satisfiesHardRequirements(
@@ -64,6 +65,7 @@ export function rankProperties<T extends MatchingProperty>(
   search: MatchingSearch,
   properties: T[],
   weights: PropertySearchWeights,
+  behavioralPreferences: BehavioralPreference[] = [],
 ): MatchResult<T>[] {
   return properties
     .filter((property) => satisfiesHardRequirements(search, property))
@@ -82,16 +84,33 @@ export function rankProperties<T extends MatchingProperty>(
           ? 100
           : closeness(Number(property.rent), Number(rentTarget));
       const bhk = search.bhk == null || property.bhk === search.bhk ? 100 : 0;
-      const availability = dateScore(
-        property.available_from,
-        search.available_from,
-      );
+      const availability =
+        search.available_from == null ||
+        property.available_from >= search.available_from
+          ? 100
+          : 0;
       const furnishing =
         search.furnishing == null || property.furnishing === search.furnishing
           ? 100
           : 0;
       const quality =
         (Number(property.quality_score) + Number(property.freshness_score)) / 2;
+      const behavioralMatches = behavioralPreferences.filter(
+        (preference) =>
+          (preference.key === 'preferred_locality' &&
+            String(preference.value).toLowerCase() ===
+              property.locality.toLowerCase()) ||
+          (preference.key === 'preferred_furnishing' &&
+            String(preference.value) === property.furnishing) ||
+          (preference.key === 'preferred_rent' &&
+            Math.abs(Number(property.rent) - Number(preference.value)) <=
+              Number(preference.value) * 0.1) ||
+          (preference.key === 'preferred_area' &&
+            property.area != null &&
+            Math.abs(Number(property.area) - Number(preference.value)) <=
+              Number(preference.value) * 0.15),
+      ).length;
+      const behavioralBoost = Math.min(5, behavioralMatches * 1.5);
       const score =
         (location * weights.location +
           rent * weights.rent +
@@ -100,19 +119,19 @@ export function rankProperties<T extends MatchingProperty>(
           furnishing * weights.furnishing +
           weights.amenities * 100 +
           quality * weights.quality) /
-        100;
+          100 +
+        behavioralBoost;
       const explanation = [
         location === 100
           ? 'Matches requested location'
           : 'Matches requested city',
         rent >= 80 ? 'Fits the budget well' : 'Budget fit is less close',
-        bhk === 100 ? 'Matches requested BHK' : 'BHK differs from preference',
-        availability === 100
-          ? 'Available for the requested date'
-          : 'Availability needs review',
+        'Matches requested BHK',
+        'Available for the requested date',
         furnishing === 100
           ? 'Matches furnishing preference'
           : 'Furnishing differs from preference',
+        ...(behavioralBoost > 0 ? ['Matches learned preferences'] : []),
       ];
       return { property, score: Math.round(score * 100) / 100, explanation };
     })
