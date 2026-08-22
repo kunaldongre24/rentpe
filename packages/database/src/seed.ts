@@ -4,7 +4,12 @@ import { readDatabaseConfig } from './config.js';
 import type { Database } from './types.js';
 
 const localities = [
-  ['HSR Layout', 12.9116, 77.6389, ['HSR', 'H.S.R Layout']],
+  [
+    'HSR Layout',
+    12.9116,
+    77.6389,
+    ['HSR', 'H.S.R Layout', '14th Main HSR', '14th Main, HSR'],
+  ],
   ['Koramangala', 12.9352, 77.6245, ['Koramangala 5th Block']],
   ['Indiranagar', 12.9784, 77.6408, []],
   ['Whitefield', 12.9698, 77.75, []],
@@ -95,7 +100,7 @@ async function seedLocations(
       latitude,
       longitude,
     };
-    const result = await sql<{ changed: boolean }>`
+    const result = await sql<{ inserted: boolean }>`
       insert into locations (id,name,country,state,city,locality,normalized_name,aliases,latitude,longitude)
       values (${desired.id},${desired.name},'India','Karnataka','Bengaluru',${desired.name},${desired.normalizedName},${JSON.stringify(desired.aliases)}::jsonb,${desired.latitude},${desired.longitude})
       on conflict (normalized_name) do update set
@@ -104,13 +109,13 @@ async function seedLocations(
         longitude=excluded.longitude, updated_at=now()
       where (locations.name,locations.country,locations.state,locations.city,locations.locality,locations.aliases,locations.latitude,locations.longitude)
         is distinct from (excluded.name,excluded.country,excluded.state,excluded.city,excluded.locality,excluded.aliases,excluded.latitude,excluded.longitude)
-      returning (xmax = 0) changed
+      returning (xmax = 0) inserted
     `.execute(trx);
     const row = result.rows[0];
     increment(
       stats,
       'locations',
-      row ? (row.changed ? 'Inserted' : 'Updated') : 'Skipped',
+      row ? (row.inserted ? 'Inserted' : 'Updated') : 'Skipped',
     );
   }
 }

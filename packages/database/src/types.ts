@@ -52,7 +52,7 @@ export interface PropertySearchesTable extends Timestamps {
   user_id: string;
   intent: string;
   status: string;
-  city: string;
+  city: string | null;
   locality: string | null;
   property_type: string | null;
   bhk: number | null;
@@ -75,7 +75,7 @@ export interface SearchRequirementsTable {
   id: Generated<string>;
   search_id: string;
   requirement_key: string;
-  value: Json | null;
+  value: string | null;
   value_text: string | null;
   value_number: Numeric | null;
   value_boolean: boolean | null;
@@ -83,7 +83,7 @@ export interface SearchRequirementsTable {
   confidence: Numeric;
   source: string;
   preference_type: string;
-  updated_at: Generated<Timestamp>;
+  updated_at: Timestamp;
 }
 export interface PropertiesTable extends Timestamps {
   id: Generated<string>;
