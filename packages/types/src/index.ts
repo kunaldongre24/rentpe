@@ -1,5 +1,6 @@
 import { z } from 'zod';
 export * from './requirements.js';
+export * from './property-search.js';
 
 export interface HealthResponse {
   service: string;

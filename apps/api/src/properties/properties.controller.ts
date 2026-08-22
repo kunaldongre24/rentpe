@@ -12,17 +12,32 @@ import {
 import {
   paginationSchema,
   propertyCreateSchema,
+  propertySearchQuerySchema,
   propertyUpdateSchema,
   uuidSchema,
 } from '@property-assistant/types';
 import { parseRequest } from '../common/request.js';
+import { PropertySearchService } from './property-search.service.js';
 import { PropertiesService } from './properties.service.js';
 
 @Controller('properties')
 export class PropertiesController {
   constructor(
     @Inject(PropertiesService) private readonly properties: PropertiesService,
+    @Inject(PropertySearchService)
+    private readonly search: PropertySearchService,
   ) {}
+
+  @Get('search/:searchId')
+  searchProperties(
+    @Param('searchId') searchId: string,
+    @Query() query: unknown,
+  ) {
+    return this.search.search(
+      parseRequest(uuidSchema, searchId),
+      parseRequest(propertySearchQuerySchema, query),
+    );
+  }
 
   @Get()
   list(@Query() query: unknown) {
