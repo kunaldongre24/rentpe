@@ -42,12 +42,24 @@ function stringValue(value: RequirementUpdate['value']): string {
 }
 
 function validateKeyValue(update: RequirementUpdate): void {
-  const numeric = ['bhk', 'min_rent', 'max_rent'];
+  const numeric = ['bhk', 'min_rent', 'max_rent', 'metro_proximity'];
   const boolean = ['parking', 'balcony', 'gym', 'pet_friendly', 'sunlight'];
+  const string = [
+    'city',
+    'locality',
+    'property_type',
+    'availability',
+    'furnishing',
+    'floor_preference',
+  ];
   if (numeric.includes(update.key) && typeof update.value !== 'number')
     throw new BadRequestException(`${update.key} must be numeric`);
   if (boolean.includes(update.key) && typeof update.value !== 'boolean')
     throw new BadRequestException(`${update.key} must be boolean`);
+  if (string.includes(update.key) && typeof update.value !== 'string')
+    throw new BadRequestException(`${update.key} must be a string`);
+  if (update.key === 'amenities' && !Array.isArray(update.value))
+    throw new BadRequestException('amenities must be an array');
   if (
     update.key === 'bhk' &&
     (Number(update.value) < 1 || Number(update.value) > 20)
@@ -230,26 +242,36 @@ export class RequirementsService {
     update: RequirementUpdate,
   ): Promise<void> {
     const value = update.value;
+    const accepted = update.confidence >= acceptThreshold;
+    const hardValue = <T>(hard: T): T | null => (accepted ? hard : null);
     const columnValues = {
-      ...(update.key === 'city' ? { city: stringValue(value) } : {}),
-      ...(update.key === 'locality' ? { locality: stringValue(value) } : {}),
-      ...(update.key === 'bhk' ? { bhk: Number(value) } : {}),
+      ...(update.key === 'city' ? { city: hardValue(stringValue(value)) } : {}),
+      ...(update.key === 'locality'
+        ? { locality: hardValue(stringValue(value)) }
+        : {}),
+      ...(update.key === 'bhk' ? { bhk: hardValue(Number(value)) } : {}),
       ...(update.key === 'min_rent'
-        ? { min_rent: Number(value), min_budget: Number(value) }
+        ? {
+            min_rent: hardValue(Number(value)),
+            min_budget: hardValue(Number(value)),
+          }
         : {}),
       ...(update.key === 'max_rent'
-        ? { max_rent: Number(value), max_budget: Number(value) }
+        ? {
+            max_rent: hardValue(Number(value)),
+            max_budget: hardValue(Number(value)),
+          }
         : {}),
       ...(update.key === 'property_type'
-        ? { property_type: stringValue(value) }
+        ? { property_type: hardValue(stringValue(value)) }
         : {}),
       ...(update.key === 'availability'
         ? {
-            available_from: stringValue(value),
-            move_in_date: stringValue(value),
+            available_from: hardValue(stringValue(value)),
+            move_in_date: hardValue(stringValue(value)),
           }
         : {}),
-      ...(update.key === 'furnishing'
+      ...(update.key === 'furnishing' && accepted
         ? { furnishing: stringValue(value) }
         : {}),
     };
