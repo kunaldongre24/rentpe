@@ -27,9 +27,8 @@ async function entry(
     }),
     llm: new inference.LLM({ model: 'google/gemma-4-31b-it' }),
     tts: new inference.TTS({
-      model: 'rime/mistv2',
+      model: 'rime/coda',
       voice: 'Taru',
-      language: 'hi',
     }),
     turnHandling: {
       turnDetection: new inference.TurnDetector(),
