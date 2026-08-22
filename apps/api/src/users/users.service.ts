@@ -24,7 +24,7 @@ export class UsersService {
         'created_at',
         'updated_at',
       ])
-      .orderBy('created_at desc')
+      .orderBy('created_at', 'desc')
       .limit(pagination.limit)
       .offset(pagination.offset)
       .execute();

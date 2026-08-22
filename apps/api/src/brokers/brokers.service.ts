@@ -16,7 +16,7 @@ export class BrokersService {
     return this.database.client
       .selectFrom('brokers')
       .selectAll()
-      .orderBy('created_at desc')
+      .orderBy('created_at', 'desc')
       .limit(pagination.limit)
       .offset(pagination.offset)
       .execute();

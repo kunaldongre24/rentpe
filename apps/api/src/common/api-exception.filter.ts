@@ -31,6 +31,20 @@ export class ApiExceptionFilter implements ExceptionFilter {
       });
       return;
     }
+    if (
+      code === '23514' ||
+      code === '22P02' ||
+      code === '22001' ||
+      code === '22003' ||
+      code === '22007' ||
+      code === '22008'
+    ) {
+      response.status(400).json({
+        statusCode: 400,
+        message: 'Request violates a database constraint',
+      });
+      return;
+    }
     this.logger.error(
       error instanceof Error
         ? `${error.name}: ${error.message}`

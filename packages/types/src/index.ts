@@ -106,10 +106,8 @@ export const propertyStatusSchema = z.enum([
   'DRAFT',
   'ACTIVE',
   'PAUSED',
-  'RESERVED',
   'RENTED',
   'EXPIRED',
-  'INACTIVE',
   'DELETED',
 ]);
 const propertyShape = {

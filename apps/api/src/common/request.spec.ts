@@ -4,6 +4,7 @@ import {
   locationCreateSchema,
   paginationSchema,
   propertyCreateSchema,
+  propertyStatusSchema,
   userCreateSchema,
 } from '@property-assistant/types';
 import { BadRequestException } from '@nestjs/common';
@@ -49,6 +50,17 @@ describe('CRUD request contracts', () => {
       active: true,
       responseScore: 0,
     });
+  });
+
+  it('matches the database property status enum', () => {
+    expect(propertyStatusSchema.options).toEqual([
+      'DRAFT',
+      'ACTIVE',
+      'PAUSED',
+      'RENTED',
+      'EXPIRED',
+      'DELETED',
+    ]);
   });
 
   it('rejects properties where floor exceeds total floors', () => {

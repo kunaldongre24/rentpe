@@ -17,7 +17,7 @@ export class PropertiesService {
       .selectFrom('properties')
       .selectAll()
       .where('status', '!=', 'DELETED')
-      .orderBy('created_at desc')
+      .orderBy('created_at', 'desc')
       .limit(pagination.limit)
       .offset(pagination.offset)
       .execute();
