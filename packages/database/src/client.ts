@@ -4,8 +4,18 @@ import type { Database } from './types.js';
 import type { DatabaseConfig } from './config.js';
 
 export function createDatabase(config: DatabaseConfig): Kysely<Database> {
+  const connection = new URL(config.connectionString);
+  const sslMode = connection.searchParams.get('sslmode');
+  const ssl = sslMode === 'require' ? { rejectUnauthorized: false } : undefined;
+  if (sslMode === 'require') connection.searchParams.delete('sslmode');
   return new Kysely<Database>({
-    dialect: new PostgresDialect({ pool: new Pool(config) }),
+    dialect: new PostgresDialect({
+      pool: new Pool({
+        ...config,
+        connectionString: connection.toString(),
+        ssl,
+      }),
+    }),
   });
 }
 
