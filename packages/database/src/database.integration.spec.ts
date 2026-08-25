@@ -113,7 +113,7 @@ describe.runIf(enabled)('database schema integration', () => {
     const enums = await sql<{ typname: string; enumlabel: string }>`
       select t.typname, e.enumlabel
       from pg_type t join pg_enum e on e.enumtypid = t.oid
-      where t.typname in ('search_status','property_status','furnishing_type','property_type','requirement_source','preference_type','verification_status','call_status','notification_channel','notification_status')
+      where t.typname = any(${sql.val(requiredEnums)}::text[])
       order by t.typname, e.enumsortorder
     `.execute(db);
     expect(new Set(enums.rows.map((row) => row.typname))).toEqual(
@@ -170,7 +170,7 @@ describe.runIf(enabled)('database schema integration', () => {
     ).toBe(true);
     expect(
       columns.rows.filter((row) => row.column_name !== 'embedding'),
-    ).toHaveLength(23);
+    ).toHaveLength(26);
     const timestampWithoutTimeZone = await sql<{ count: string }>`
       select count(*)::text count from information_schema.columns
       where table_schema = 'public' and data_type = 'timestamp without time zone'
