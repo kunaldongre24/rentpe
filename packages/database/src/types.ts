@@ -184,6 +184,27 @@ export interface PropertyNotificationsTable {
   created_at: Generated<Timestamp>;
 }
 
+export interface DashboardAccountsTable extends Timestamps {
+  id: Generated<string>;
+  auth_user_id: string;
+  email: string;
+  display_name: string | null;
+  phone: string | null;
+  role: string;
+  status: string;
+  broker_id: string | null;
+}
+export interface ListingAuditEventsTable {
+  id: Generated<string>;
+  property_id: string;
+  actor_account_id: string;
+  action: string;
+  previous_status: string | null;
+  new_status: string | null;
+  metadata: Json;
+  created_at: Generated<Timestamp>;
+}
+
 export interface Database {
   users: UsersTable;
   locations: LocationsTable;
@@ -197,4 +218,6 @@ export interface Database {
   property_feedback: PropertyFeedbackTable;
   behavioral_preferences: BehavioralPreferencesTable;
   property_notifications: PropertyNotificationsTable;
+  dashboard_accounts: DashboardAccountsTable;
+  listing_audit_events: ListingAuditEventsTable;
 }

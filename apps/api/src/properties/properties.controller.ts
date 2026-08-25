@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   paginationSchema,
@@ -17,6 +18,8 @@ import {
   uuidSchema,
 } from '@property-assistant/types';
 import { parseRequest } from '../common/request.js';
+import { DashboardAuthGuard } from '../auth/dashboard-auth.guard.js';
+import { AdminGuard } from '../auth/role.guards.js';
 import { PropertySearchService } from './property-search.service.js';
 import { PropertiesService } from './properties.service.js';
 
@@ -49,11 +52,13 @@ export class PropertiesController {
     return this.properties.get(parseRequest(uuidSchema, id));
   }
 
+  @UseGuards(DashboardAuthGuard, AdminGuard)
   @Post()
   create(@Body() body: unknown) {
     return this.properties.create(parseRequest(propertyCreateSchema, body));
   }
 
+  @UseGuards(DashboardAuthGuard, AdminGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() body: unknown) {
     return this.properties.update(
@@ -62,6 +67,7 @@ export class PropertiesController {
     );
   }
 
+  @UseGuards(DashboardAuthGuard, AdminGuard)
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     await this.properties.remove(parseRequest(uuidSchema, id));

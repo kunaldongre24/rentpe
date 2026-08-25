@@ -110,7 +110,7 @@ export class GupshupWhatsAppProvider implements WhatsAppProvider {
 
 export function createWhatsAppProvider(): WhatsAppProvider {
   if (process.env.WHATSAPP_PROVIDER !== 'gupshup')
-    return new LocalWhatsAppProvider();
+    throw new Error('RentPe requires WHATSAPP_PROVIDER=gupshup');
   const apiKey = process.env.GUPSHUP_API_KEY;
   const source = process.env.GUPSHUP_SOURCE;
   if (!apiKey || !source)

@@ -4,94 +4,32 @@ import type {
   LocationUpdate,
   Pagination,
 } from '@property-assistant/types';
-import { DatabaseService } from '../database/database.service.js';
-
-function normalizedName(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-');
-}
+import { LocationsRepository } from './locations.repository.js';
 
 @Injectable()
 export class LocationsService {
   constructor(
-    @Inject(DatabaseService) private readonly database: DatabaseService,
+    @Inject(LocationsRepository)
+    private readonly repository: LocationsRepository,
   ) {}
-
-  async list(pagination: Pagination) {
-    return this.database.client
-      .selectFrom('locations')
-      .selectAll()
-      .orderBy('name asc')
-      .limit(pagination.limit)
-      .offset(pagination.offset)
-      .execute();
+  list(p: Pagination) {
+    return this.repository.list(p);
   }
-
   async get(id: string) {
-    const location = await this.database.client
-      .selectFrom('locations')
-      .selectAll()
-      .where('id', '=', id)
-      .executeTakeFirst();
-    if (!location) throw new NotFoundException('Location not found');
-    return location;
+    const result = await this.repository.findById(id);
+    if (!result) throw new NotFoundException('Location not found');
+    return result;
   }
-
-  async create(input: LocationCreate) {
-    return this.database.client
-      .insertInto('locations')
-      .values({
-        name: input.name,
-        country: input.country,
-        state: input.state,
-        city: input.city,
-        locality: input.name,
-        normalized_name: normalizedName(input.name),
-        aliases: JSON.stringify(input.aliases),
-        latitude: input.latitude,
-        longitude: input.longitude,
-      })
-      .returningAll()
-      .executeTakeFirstOrThrow();
+  create(i: LocationCreate) {
+    return this.repository.create(i);
   }
-
-  async update(id: string, input: LocationUpdate) {
-    const values = {
-      ...(input.name
-        ? {
-            name: input.name,
-            locality: input.name,
-            normalized_name: normalizedName(input.name),
-          }
-        : {}),
-      ...(input.country !== undefined ? { country: input.country } : {}),
-      ...(input.state !== undefined ? { state: input.state } : {}),
-      ...(input.city !== undefined ? { city: input.city } : {}),
-      ...(input.aliases !== undefined
-        ? { aliases: JSON.stringify(input.aliases) }
-        : {}),
-      ...(input.latitude !== undefined ? { latitude: input.latitude } : {}),
-      ...(input.longitude !== undefined ? { longitude: input.longitude } : {}),
-      updated_at: new Date().toISOString(),
-    };
-    const location = await this.database.client
-      .updateTable('locations')
-      .set(values)
-      .where('id', '=', id)
-      .returningAll()
-      .executeTakeFirst();
-    if (!location) throw new NotFoundException('Location not found');
-    return location;
+  async update(id: string, i: LocationUpdate) {
+    const result = await this.repository.update(id, i);
+    if (!result) throw new NotFoundException('Location not found');
+    return result;
   }
-
-  async remove(id: string): Promise<void> {
-    const result = await this.database.client
-      .deleteFrom('locations')
-      .where('id', '=', id)
-      .executeTakeFirst();
-    if (Number(result.numDeletedRows) === 0)
+  async remove(id: string) {
+    if (!(await this.repository.remove(id)))
       throw new NotFoundException('Location not found');
   }
 }

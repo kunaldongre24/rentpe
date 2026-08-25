@@ -1,3 +1,4 @@
+import '../env.js';
 import { migrationContext } from './shared.js';
 const { database, migrator } = migrationContext();
 try {

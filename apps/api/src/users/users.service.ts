@@ -1,90 +1,34 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { DatabaseService } from '../database/database.service.js';
 import type {
   Pagination,
   UserCreate,
   UserUpdate,
 } from '@property-assistant/types';
+import { UsersRepository } from './users.repository.js';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(DatabaseService) private readonly database: DatabaseService,
+    @Inject(UsersRepository) private readonly repository: UsersRepository,
   ) {}
-
-  async list(pagination: Pagination) {
-    return this.database.client
-      .selectFrom('users')
-      .select([
-        'id',
-        'phone',
-        'normalized_phone',
-        'name',
-        'whatsapp_number',
-        'created_at',
-        'updated_at',
-      ])
-      .orderBy('created_at', 'desc')
-      .limit(pagination.limit)
-      .offset(pagination.offset)
-      .execute();
+  list(pagination: Pagination) {
+    return this.repository.list(pagination);
   }
-
   async get(id: string) {
-    const user = await this.database.client
-      .selectFrom('users')
-      .selectAll()
-      .where('id', '=', id)
-      .executeTakeFirst();
+    const user = await this.repository.findById(id);
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
-
-  async create(input: UserCreate) {
-    return this.database.client
-      .insertInto('users')
-      .values({
-        phone: input.phone,
-        normalized_phone: input.phone.toLowerCase(),
-        phone_number: input.phone,
-        name: input.name ?? null,
-        whatsapp_number: input.whatsappNumber ?? null,
-      })
-      .returningAll()
-      .executeTakeFirstOrThrow();
+  create(input: UserCreate) {
+    return this.repository.create(input);
   }
-
   async update(id: string, input: UserUpdate) {
-    const values = {
-      ...(input.phone
-        ? {
-            phone: input.phone,
-            normalized_phone: input.phone.toLowerCase(),
-            phone_number: input.phone,
-          }
-        : {}),
-      ...(input.name !== undefined ? { name: input.name } : {}),
-      ...(input.whatsappNumber !== undefined
-        ? { whatsapp_number: input.whatsappNumber }
-        : {}),
-      updated_at: new Date().toISOString(),
-    };
-    const user = await this.database.client
-      .updateTable('users')
-      .set(values)
-      .where('id', '=', id)
-      .returningAll()
-      .executeTakeFirst();
+    const user = await this.repository.update(id, input);
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
-
-  async remove(id: string): Promise<void> {
-    const result = await this.database.client
-      .deleteFrom('users')
-      .where('id', '=', id)
-      .executeTakeFirst();
-    if (Number(result.numDeletedRows) === 0)
+  async remove(id: string) {
+    if (!(await this.repository.remove(id)))
       throw new NotFoundException('User not found');
   }
 }

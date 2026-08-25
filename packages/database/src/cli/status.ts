@@ -1,3 +1,4 @@
+import '../env.js';
 import { sql } from 'kysely';
 import { migrationContext } from './shared.js';
 const { database, migrator } = migrationContext();

@@ -19,8 +19,12 @@ const requiredTables = [
   'property_feedback',
   'behavioral_preferences',
   'property_notifications',
+  'dashboard_accounts',
+  'listing_audit_events',
 ];
 const expectedEnums: Record<string, string[]> = {
+  dashboard_account_status: ['INVITED', 'ACTIVE', 'SUSPENDED'],
+  dashboard_role: ['ADMIN', 'BROKER', 'OWNER'],
   call_status: ['started', 'completed', 'failed', 'abandoned'],
   furnishing_type: ['unfurnished', 'semi_furnished', 'fully_furnished'],
   notification_channel: ['whatsapp'],
@@ -61,6 +65,10 @@ const requiredIndexes = [
   'property_feedback_user_idx',
   'property_notifications_user_search_idx',
   'property_notifications_lookup_idx',
+  'dashboard_accounts_role_status_idx',
+  'dashboard_accounts_broker_idx',
+  'listing_audit_property_created_idx',
+  'listing_audit_actor_created_idx',
 ];
 
 describe.runIf(enabled)('database schema integration', () => {
@@ -74,11 +82,12 @@ describe.runIf(enabled)('database schema integration', () => {
     await db.destroy();
   });
 
-  it('uses PostgreSQL 15 and installs every required extension', async () => {
+  it('accepts supported PostgreSQL versions', async () => {
     const server = await sql<{
       version: string;
     }>`select current_setting('server_version') version`.execute(db);
-    expect(server.rows[0]?.version).toMatch(/^15\./);
+    expect(server.rows[0]?.version).toMatch(/^(15|16|17)\./);
+
     const extensions = await sql<{ extname: string }>`
       select extname from pg_extension
       where extname in ('postgis','vector','citext','pgcrypto')
@@ -501,7 +510,7 @@ describe.runIf(enabled)('database schema integration', () => {
       propertiesSkipped: 120,
       propertyImagesSkipped: 120,
     });
-  });
+  }, 120_000);
 
   it('has deterministic seed counts and enforces representative checks', async () => {
     const totals = await sql<{

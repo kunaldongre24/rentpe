@@ -45,7 +45,6 @@ describe('RequirementsService', () => {
       'bhk',
       'max_rent',
       'property_type',
-      'availability',
     ]);
     expect(result.ready).toBe(false);
   });

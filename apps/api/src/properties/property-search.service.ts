@@ -85,6 +85,7 @@ export class PropertySearchService {
     );
     return {
       search,
+      total: ranked.length,
       properties: ranked
         .slice(query.offset, query.offset + query.limit)
         .map(({ property, ...match }) => ({ ...property, ...match })),

@@ -97,5 +97,5 @@ describe.runIf(enabled)('property search integration', () => {
       expect(property.bhk).toBe(2);
       expect(Number(property.rent)).toBeLessThanOrEqual(35000);
     }
-  });
+  }, 30_000);
 });

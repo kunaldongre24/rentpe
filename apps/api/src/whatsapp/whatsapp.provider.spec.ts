@@ -26,11 +26,11 @@ describe('GupshupWhatsAppProvider', () => {
     expect(fetcher).toHaveBeenCalledOnce();
   });
 
-  it('uses the local provider unless Gupshup is explicitly selected', () => {
+  it('requires Gupshup to be selected', () => {
     const previous = process.env.WHATSAPP_PROVIDER;
     delete process.env.WHATSAPP_PROVIDER;
-    expect(createWhatsAppProvider().constructor.name).toBe(
-      'LocalWhatsAppProvider',
+    expect(() => createWhatsAppProvider()).toThrow(
+      'RentPe requires WHATSAPP_PROVIDER=gupshup',
     );
     if (previous === undefined) delete process.env.WHATSAPP_PROVIDER;
     else process.env.WHATSAPP_PROVIDER = previous;

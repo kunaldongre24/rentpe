@@ -1,3 +1,4 @@
+import '../env.js';
 import { seedDatabase, type SeedStats } from '../seed.js';
 
 function assertInitial(stats: SeedStats): void {

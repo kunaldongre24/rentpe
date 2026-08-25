@@ -20,7 +20,6 @@ const requiredKeys: RequirementKey[] = [
   'bhk',
   'max_rent',
   'property_type',
-  'availability',
 ];
 const acceptThreshold = 0.85;
 const confirmationThreshold = 0.6;

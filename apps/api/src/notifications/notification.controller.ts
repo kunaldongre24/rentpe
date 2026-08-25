@@ -1,4 +1,11 @@
-import { Controller, Inject, Param, Post } from '@nestjs/common';
+import {
+  Controller,
+  Headers,
+  Inject,
+  Param,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import {
   propertyNotificationTriggerSchema,
   uuidSchema,
@@ -14,7 +21,16 @@ export class NotificationController {
   ) {}
 
   @Post('properties/:propertyId')
-  notifyProperty(@Param('propertyId') propertyId: string) {
+  notifyProperty(
+    @Param('propertyId') propertyId: string,
+    @Headers('authorization') authorization?: string,
+  ) {
+    const expected = process.env.INTERNAL_API_TOKEN;
+    const token = authorization?.startsWith('Bearer ')
+      ? authorization.slice('Bearer '.length)
+      : undefined;
+    if (!expected || token !== expected)
+      throw new UnauthorizedException('Invalid internal tool token');
     return this.notifications.notifyNewProperty(
       parseRequest(propertyNotificationTriggerSchema, {
         propertyId: parseRequest(uuidSchema, propertyId),

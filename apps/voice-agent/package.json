@@ -18,7 +18,8 @@
     "@livekit/agents": "^1.7.0",
     "@livekit/rtc-node": "^0.13.34",
     "@property-assistant/config": "workspace:*",
-    "@property-assistant/types": "workspace:*"
+    "@property-assistant/types": "workspace:*",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",

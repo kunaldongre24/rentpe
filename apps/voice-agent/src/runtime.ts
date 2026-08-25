@@ -6,7 +6,7 @@ import type {
 import type {
   VoiceToolRequest,
   VoiceToolResponse,
-} from '@property-assistant/types';
+} from './voice-tool-contracts.js';
 
 export class VoiceAgentRuntime implements VoiceConversationRuntime {
   constructor(

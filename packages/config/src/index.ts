@@ -1,6 +1,30 @@
 import { z } from 'zod';
 export * from './vobiz.js';
 
+export const whatsappEnvironmentSchema = z
+  .object({
+    WHATSAPP_PROVIDER: z.literal('gupshup').default('gupshup'),
+    GUPSHUP_API_KEY: z.string().min(1).optional(),
+    GUPSHUP_SOURCE: z.string().min(1).optional(),
+    GUPSHUP_API_BASE_URL: z.url().default('https://api.gupshup.io'),
+  })
+  .superRefine((value, context) => {
+    if (value.WHATSAPP_PROVIDER === 'gupshup') {
+      if (!value.GUPSHUP_API_KEY)
+        context.addIssue({
+          code: 'custom',
+          path: ['GUPSHUP_API_KEY'],
+          message: 'Gupshup API key is required',
+        });
+      if (!value.GUPSHUP_SOURCE)
+        context.addIssue({
+          code: 'custom',
+          path: ['GUPSHUP_SOURCE'],
+          message: 'Gupshup source is required',
+        });
+    }
+  });
+
 export interface PropertySearchWeights {
   location: number;
   rent: number;

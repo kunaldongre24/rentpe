@@ -20,16 +20,34 @@ export class WhatsAppDeliveryService {
   async deliverNext(userPhone: string, limit = 3) {
     const user = await this.database.client
       .selectFrom('users')
-      .select(['id', 'whatsapp_number', 'phone'])
+      .select(['id'])
       .where('normalized_phone', '=', userPhone)
       .executeTakeFirst();
     if (!user) throw new NotFoundException('WhatsApp user not found');
     const search = await this.database.client
       .selectFrom('property_searches')
-      .select(['id', 'user_id'])
+      .select(['id'])
       .where('user_id', '=', user.id)
       .where('status', '=', 'ACTIVE')
       .orderBy('updated_at', 'desc')
+      .executeTakeFirst();
+    if (!search) throw new NotFoundException('Active search not found');
+    return this.deliverNextForSearch(user.id, search.id, limit);
+  }
+
+  async deliverNextForSearch(userId: string, searchId: string, limit = 3) {
+    const user = await this.database.client
+      .selectFrom('users')
+      .select(['id', 'whatsapp_number', 'phone'])
+      .where('id', '=', userId)
+      .executeTakeFirst();
+    if (!user) throw new NotFoundException('WhatsApp user not found');
+    const search = await this.database.client
+      .selectFrom('property_searches')
+      .select(['id'])
+      .where('id', '=', searchId)
+      .where('user_id', '=', user.id)
+      .where('status', '=', 'ACTIVE')
       .executeTakeFirst();
     if (!search) throw new NotFoundException('Active search not found');
 

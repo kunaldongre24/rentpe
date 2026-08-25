@@ -1,3 +1,4 @@
+import '../env.js';
 import { sql } from 'kysely';
 import { migrationContext } from './shared.js';
 
@@ -10,8 +11,8 @@ try {
     version: string;
   }>`select current_setting('server_version') version`.execute(db);
   assert(
-    version.rows[0]?.version.startsWith('15.'),
-    `Expected PostgreSQL 15, got ${version.rows[0]?.version}`,
+    /^(15|16|17)\./.test(version.rows[0]?.version ?? ''),
+    `Expected PostgreSQL 15, 16, or 17, got ${version.rows[0]?.version}`,
   );
   const extensions = await sql<{
     extname: string;

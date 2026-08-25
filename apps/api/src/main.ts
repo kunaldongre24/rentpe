@@ -11,7 +11,8 @@ async function bootstrap(): Promise<void> {
     origin: environment.NODE_ENV === 'production' ? false : true,
   });
   app.setGlobalPrefix('api');
-  await app.listen(environment.API_PORT, environment.API_HOST);
+  const port = Number(process.env.PORT ?? environment.API_PORT);
+  await app.listen(port, environment.API_HOST);
 }
 
 void bootstrap();

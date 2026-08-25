@@ -1,27 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { PropertyFeedbackInput } from '@property-assistant/types';
 import { DatabaseService } from '../database/database.service.js';
+import { FeedbackRepository } from './feedback.repository.js';
 
 const positiveFeedback = new Set(['liked', 'shortlisted', 'contacted']);
 
 @Injectable()
 export class FeedbackService {
   constructor(
+    @Inject(FeedbackRepository) private readonly repository: FeedbackRepository,
     @Inject(DatabaseService) private readonly database: DatabaseService,
   ) {}
 
   async record(input: PropertyFeedbackInput) {
-    const feedback = await this.database.client
-      .insertInto('property_feedback')
-      .values({
-        user_id: input.userId,
-        search_id: input.searchId,
-        property_id: input.propertyId ?? null,
-        feedback_type: input.feedbackType,
-        structured_feedback: JSON.stringify({}),
-      })
-      .returningAll()
-      .executeTakeFirstOrThrow();
+    const feedback = await this.repository.create(input);
     if (input.propertyId && positiveFeedback.has(input.feedbackType))
       await this.learnFromProperty(
         input.userId,

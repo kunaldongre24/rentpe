@@ -2,7 +2,41 @@
 
 ProjectX is a phone-first rental property discovery platform for India. The repository contains staged application foundations and verified phase implementations; external telephony and AI provider connections remain account/configuration dependent.
 
-## Telephony Architecture
+The admin/partner console uses Supabase Auth for identity and NestJS/Kysely for all application data. Configure `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_URL`, `SUPABASE_ISSUER`, `SUPABASE_JWKS_URL`, and `SUPABASE_AUDIENCE=authenticated`. Dashboard accounts are provisioned in `dashboard_accounts`; the API never uses the Supabase data client for properties or operations data.
+
+## Dashboard setup
+
+Create dashboard users in Supabase Auth, then provision their application role through the admin-only API or a controlled SQL migration. The `auth_user_id` is the UUID from `auth.users`; do not put roles in editable user metadata.
+
+Example controlled provisioning after migration:
+
+```sql
+insert into public.dashboard_accounts (auth_user_id, email, display_name, role, status)
+values ('SUPABASE_AUTH_USER_UUID', 'admin@example.com', 'RentPe Admin', 'ADMIN', 'ACTIVE');
+```
+
+Broker/owner accounts require a matching `brokers.id`. Dashboard routes require a Supabase bearer access token:
+
+- `GET /api/dashboard/me`
+- `GET /api/dashboard/operations`
+- `GET|POST /api/admin/accounts`
+- `PATCH /api/admin/accounts/:id/status`
+- `GET|POST /api/partner/properties`
+- `PATCH /api/partner/properties/:id`
+- `PATCH /api/partner/properties/:id/status`
+
+Partner property reads and writes are restricted to the account's `broker_id`; admins can access all listings. Kysely remains the only application data access layer.
+
+New foundational endpoints include:
+
+- `GET|POST /api/searches`, `GET|PATCH|DELETE /api/searches/:id`
+- `GET|POST /api/preferences`, `GET|PATCH|DELETE /api/preferences/:id`
+- `GET|POST /api/conversations/sessions`, `GET|PATCH|DELETE /api/conversations/sessions/:id`
+- `GET|POST /api/conversations/events`
+
+Internal notification triggers require `Authorization: Bearer $INTERNAL_API_TOKEN`.
+
+LiveKit CLI is supported for account operations. From an authenticated shell, inspect the configured project with `lk project list --project rentpe`, then use `lk sip`, `lk agent`, and `lk number` commands. Do not run purchase, deploy, or destructive commands until the target project, phone number, SIP provider, and production secrets have been confirmed.
 
 ProjectX uses Vobiz as the telephony/SIP provider and LiveKit as the only voice-agent runtime. See [`docs/telephony-vobiz.md`](docs/telephony-vobiz.md) for the SIP flow, provider boundaries, configuration placeholders, session isolation, concurrency target, and onboarding checklist.
 
@@ -23,7 +57,7 @@ Vobiz account-specific DID availability, KYC, SIP termination, webhook fields, p
 - `packages/database`: Kysely, PostgreSQL pool, ordered migrations, schema types, catalog-level integration tests, and deterministic transactional seeds.
 - `infra/docker`: Application Dockerfiles. Phase 1 does not run PostgreSQL or external providers.
 
-The intended architecture is a modular monolith: Vobiz provides telephony/SIP only, LiveKit owns the real-time voice runtime, NestJS owns business logic and authenticated tools, and Supabase PostgreSQL remains the database. See [`docs/telephony-vobiz.md`](docs/telephony-vobiz.md).
+The production WhatsApp provider is Gupshup. The API uses the `WhatsAppProvider` interface and the concrete `GupshupWhatsAppProvider`; local delivery is not a supported production fallback. Configure `WHATSAPP_PROVIDER=gupshup`, `GUPSHUP_API_KEY`, `GUPSHUP_SOURCE`, and `GUPSHUP_API_BASE_URL`.
 
 ## Prerequisites
 

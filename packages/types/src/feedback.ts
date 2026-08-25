@@ -14,5 +14,7 @@ export const propertyFeedbackSchema = z.object({
   searchId: z.uuid(),
   propertyId: z.uuid().nullable().optional(),
   feedbackType: feedbackTypeSchema,
+  feedbackText: z.string().trim().max(2_000).nullable().optional(),
+  structuredFeedback: z.record(z.string(), z.unknown()).optional(),
 });
 export type PropertyFeedbackInput = z.infer<typeof propertyFeedbackSchema>;

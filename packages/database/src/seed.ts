@@ -1,5 +1,6 @@
 import { sql, type Transaction } from 'kysely';
 import { createDatabase } from './client.js';
+import './env.js';
 import { readDatabaseConfig } from './config.js';
 import type { Database } from './types.js';
 
