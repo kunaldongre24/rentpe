@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   searchCreateSchema,
@@ -14,10 +15,12 @@ import {
   searchUpdateSchema,
   uuidSchema,
 } from '@property-assistant/types';
+import { ProductionAdminGuard } from '../auth/role.guards.js';
 import { parseRequest } from '../common/request.js';
 import { SearchService } from './search.service.js';
 
 @Controller('searches')
+@UseGuards(ProductionAdminGuard)
 export class SearchController {
   constructor(private readonly searches: SearchService) {}
 

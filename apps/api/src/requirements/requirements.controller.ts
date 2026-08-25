@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import {
   locationResolveSchema,
@@ -13,11 +14,13 @@ import {
   searchCreateSchema,
   uuidSchema,
 } from '@property-assistant/types';
+import { ProductionAdminGuard } from '../auth/role.guards.js';
 import { parseRequest } from '../common/request.js';
 import { LocationResolutionService } from './location-resolution.service.js';
 import { RequirementsService } from './requirements.service.js';
 
 @Controller()
+@UseGuards(ProductionAdminGuard)
 export class RequirementsController {
   constructor(
     @Inject(RequirementsService)

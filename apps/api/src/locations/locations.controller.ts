@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   locationCreateSchema,
@@ -15,10 +16,12 @@ import {
   paginationSchema,
   uuidSchema,
 } from '@property-assistant/types';
+import { ProductionAdminGuard } from '../auth/role.guards.js';
 import { parseRequest } from '../common/request.js';
 import { LocationsService } from './locations.service.js';
 
 @Controller('locations')
+@UseGuards(ProductionAdminGuard)
 export class LocationsController {
   constructor(
     @Inject(LocationsService) private readonly locations: LocationsService,

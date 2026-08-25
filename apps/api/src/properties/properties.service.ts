@@ -12,8 +12,10 @@ export class PropertiesService {
     @Inject(PropertiesRepository)
     private readonly repository: PropertiesRepository,
   ) {}
-  list(p: Pagination) {
-    return this.repository.list(p);
+  list(p: Pagination, brokerId?: string) {
+    return brokerId
+      ? this.repository.list(p, brokerId)
+      : this.repository.list(p);
   }
   async get(id: string) {
     const result = await this.repository.findById(id);

@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   callSessionCreateSchema,
@@ -16,10 +17,12 @@ import {
   paginationSchema,
   uuidSchema,
 } from '@property-assistant/types';
+import { ProductionAdminGuard } from '../auth/role.guards.js';
 import { parseRequest } from '../common/request.js';
 import { ConversationService } from './conversation.service.js';
 
 @Controller()
+@UseGuards(ProductionAdminGuard)
 export class ConversationController {
   constructor(private readonly conversations: ConversationService) {}
   @Get('conversations/sessions') listSessions(@Query() query: unknown) {

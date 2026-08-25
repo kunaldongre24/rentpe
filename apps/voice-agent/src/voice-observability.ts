@@ -3,6 +3,7 @@ import {
   type AgentMetrics,
   type voice,
 } from '@livekit/agents';
+import { createHash } from 'node:crypto';
 
 export function attachVoiceObservability<UserData>(
   session: voice.AgentSession<UserData>,
@@ -10,8 +11,8 @@ export function attachVoiceObservability<UserData>(
 ): void {
   const base = {
     component: 'voice-agent',
-    room: context.roomName,
-    callerIdentity: context.callerIdentity,
+    roomHash: stableHash(context.roomName),
+    callerHash: stableHash(context.callerIdentity),
   };
 
   session.on(AgentSessionEventTypes.MetricsCollected, ({ metrics }) => {
@@ -61,6 +62,10 @@ export function attachVoiceObservability<UserData>(
       }),
     );
   });
+}
+
+function stableHash(value: string): string {
+  return createHash('sha256').update(value).digest('hex').slice(0, 16);
 }
 
 function metricFields(metric: AgentMetrics): Record<string, unknown> {

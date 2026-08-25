@@ -54,6 +54,7 @@ export const baseEnvironmentSchema = z.object({
 export const apiEnvironmentSchema = baseEnvironmentSchema.extend({
   API_HOST: z.string().default('0.0.0.0'),
   API_PORT: z.coerce.number().int().positive().default(3001),
+  WEB_ORIGIN: z.url().optional(),
   DATABASE_URL: z.string().min(1),
   DATABASE_POOL_MAX: z.coerce.number().int().positive().default(10),
   DATABASE_IDLE_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),

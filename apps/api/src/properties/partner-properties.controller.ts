@@ -43,12 +43,10 @@ export class PartnerPropertiesController {
     @Headers('x-limit') limit?: string,
   ) {
     const account = requireDashboardAccount(request);
-    const rows = await this.properties.list(
+    return this.properties.list(
       parseRequest(paginationSchema, { limit: limit ?? 100, offset: 0 }),
+      account.role === 'ADMIN' ? undefined : account.brokerId!,
     );
-    return account.role === 'ADMIN'
-      ? rows
-      : rows.filter((property) => property.broker_id === account.brokerId);
   }
 
   @Post()

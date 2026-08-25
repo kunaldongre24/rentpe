@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   brokerCreateSchema,
@@ -15,10 +16,12 @@ import {
   paginationSchema,
   uuidSchema,
 } from '@property-assistant/types';
+import { ProductionAdminGuard } from '../auth/role.guards.js';
 import { parseRequest } from '../common/request.js';
 import { BrokersService } from './brokers.service.js';
 
 @Controller('brokers')
+@UseGuards(ProductionAdminGuard)
 export class BrokersController {
   constructor(
     @Inject(BrokersService) private readonly brokers: BrokersService,

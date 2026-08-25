@@ -5,8 +5,9 @@ import {
   Injectable,
 } from '@nestjs/common';
 import type { DashboardRole } from '@property-assistant/types';
+import { DashboardAuthService } from './dashboard-auth.service.js';
 import {
-  DashboardRequest,
+  type DashboardRequest,
   requireDashboardAccount,
 } from './dashboard-auth.guard.js';
 
@@ -31,6 +32,20 @@ export class PartnerGuard implements CanActivate {
     ).role;
     if (role !== 'ADMIN' && role !== 'BROKER' && role !== 'OWNER')
       throw new ForbiddenException('Partner access required');
+    return true;
+  }
+}
+
+@Injectable()
+export class ProductionAdminGuard implements CanActivate {
+  constructor(private readonly auth: DashboardAuthService) {}
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    if (process.env.NODE_ENV !== 'production') return true;
+    const request = context.switchToHttp().getRequest<DashboardRequest>();
+    const account = await this.auth.authenticate(request.headers.authorization);
+    if (account.role !== 'ADMIN')
+      throw new ForbiddenException('Admin access required');
+    request.dashboardAccount = account;
     return true;
   }
 }

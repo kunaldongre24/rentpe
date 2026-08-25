@@ -11,11 +11,13 @@ export class PropertiesRepository {
   constructor(
     @Inject(DatabaseService) private readonly database: DatabaseService,
   ) {}
-  list(p: Pagination) {
-    return this.database.client
+  list(p: Pagination, brokerId?: string) {
+    let query = this.database.client
       .selectFrom('properties')
       .selectAll()
-      .where('status', '!=', 'DELETED')
+      .where('status', '!=', 'DELETED');
+    if (brokerId) query = query.where('broker_id', '=', brokerId);
+    return query
       .orderBy('created_at', 'desc')
       .limit(p.limit)
       .offset(p.offset)

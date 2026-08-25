@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   paginationSchema,
@@ -15,10 +16,12 @@ import {
   userUpdateSchema,
   uuidSchema,
 } from '@property-assistant/types';
+import { ProductionAdminGuard } from '../auth/role.guards.js';
 import { parseRequest } from '../common/request.js';
 import { UsersService } from './users.service.js';
 
 @Controller('users')
+@UseGuards(ProductionAdminGuard)
 export class UsersController {
   constructor(@Inject(UsersService) private readonly users: UsersService) {}
 

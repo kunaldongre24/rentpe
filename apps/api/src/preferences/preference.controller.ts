@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   preferenceCreateSchema,
@@ -14,10 +15,12 @@ import {
   preferenceUpdateSchema,
   uuidSchema,
 } from '@property-assistant/types';
+import { ProductionAdminGuard } from '../auth/role.guards.js';
 import { parseRequest } from '../common/request.js';
 import { PreferenceService } from './preference.service.js';
 
 @Controller('preferences')
+@UseGuards(ProductionAdminGuard)
 export class PreferenceController {
   constructor(private readonly preferences: PreferenceService) {}
   @Get() list(@Query() query: unknown) {
