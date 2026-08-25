@@ -21,7 +21,7 @@ describe.runIf(enabled)('property search integration', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    await app?.close();
   });
 
   it('applies hard filters, excludes inactive rows, paginates, and supports radius', async () => {

@@ -22,7 +22,7 @@ describe.runIf(enabled)('requirement engine integration', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    await app?.close();
   });
 
   it('resolves a seeded location alias without asking for city', async () => {

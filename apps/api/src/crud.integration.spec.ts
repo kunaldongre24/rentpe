@@ -22,7 +22,7 @@ describe.runIf(enabled)('CRUD API integration', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    await app?.close();
   });
 
   it('validates, creates, reads, updates, and deletes a user', async () => {

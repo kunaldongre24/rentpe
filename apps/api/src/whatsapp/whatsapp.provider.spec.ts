@@ -26,13 +26,32 @@ describe('GupshupWhatsAppProvider', () => {
     expect(fetcher).toHaveBeenCalledOnce();
   });
 
-  it('requires Gupshup to be selected', () => {
-    const previous = process.env.WHATSAPP_PROVIDER;
+  it('uses the local adapter outside production when no provider is configured', () => {
+    const previousProvider = process.env.WHATSAPP_PROVIDER;
+    const previousNodeEnvironment = process.env.NODE_ENV;
     delete process.env.WHATSAPP_PROVIDER;
-    expect(() => createWhatsAppProvider()).toThrow(
-      'RentPe requires WHATSAPP_PROVIDER=gupshup',
+    process.env.NODE_ENV = 'test';
+    expect(createWhatsAppProvider().constructor.name).toBe(
+      'LocalWhatsAppProvider',
     );
-    if (previous === undefined) delete process.env.WHATSAPP_PROVIDER;
-    else process.env.WHATSAPP_PROVIDER = previous;
+    restoreEnvironment('WHATSAPP_PROVIDER', previousProvider);
+    restoreEnvironment('NODE_ENV', previousNodeEnvironment);
+  });
+
+  it('requires Gupshup in production', () => {
+    const previousProvider = process.env.WHATSAPP_PROVIDER;
+    const previousNodeEnvironment = process.env.NODE_ENV;
+    delete process.env.WHATSAPP_PROVIDER;
+    process.env.NODE_ENV = 'production';
+    expect(() => createWhatsAppProvider()).toThrow(
+      'Production requires WHATSAPP_PROVIDER=gupshup',
+    );
+    restoreEnvironment('WHATSAPP_PROVIDER', previousProvider);
+    restoreEnvironment('NODE_ENV', previousNodeEnvironment);
   });
 });
+
+function restoreEnvironment(key: string, value: string | undefined): void {
+  if (value === undefined) delete process.env[key];
+  else process.env[key] = value;
+}
