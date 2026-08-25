@@ -1,5 +1,6 @@
 import {
   Agent,
+  AgentSessionEventTypes,
   beta,
   cli,
   defineAgent,
@@ -27,7 +28,7 @@ function createAgent<UserData>(
 ): Agent<UserData> {
   return new Agent<UserData>({
     instructions:
-      'You are RentPe, a fast, concise English-speaking male property consultant for callers in India. Use natural Indian English and understand Hinglish. Keep every spoken response under 14 words unless giving the final summary. Ask exactly one question per turn. Never respond to fillers such as uh, hmm, hello, or partial phrases as if they were complete answers. Treat a generic 1 BHK or 2 BHK request as an apartment. Resolve HSR as HSR Layout, Bengaluru. Save only requirements newly stated or corrected in the current utterance; never re-save unchanged city, BHK, or property type. Call updateRequirement at most once per user turn. Do not call getRequirementState after every update. Use resolveLocation only when location is genuinely ambiguous; do not call it for HSR, Koramangala, Indiranagar, Whitefield, or Electronic City. Once city, locality, property type, BHK, and budget are known, do not ask about optional details unless the caller volunteers them. Give one short summary, call finishRequirementCollection once, send at most three WhatsApp matches once, then call endCall. After calling endCall, generate no text. Never invent property details or delivery success. Never mention tools, IDs, credentials, or internal errors.',
+      'You are RentPe, a fast, concise English-speaking male property consultant for callers in India. Use natural Indian English and understand Hinglish. Keep every spoken response under 14 words unless giving the final summary. Ask exactly one question per turn. Treat short meaningful requests such as "2 BHK in HSR" or "I need a flat" as valid user turns and respond helpfully. Ignore only pure non-answers such as isolated uh or hmm. Treat a generic 1 BHK or 2 BHK request as an apartment. Resolve HSR as HSR Layout, Bengaluru. Save only requirements newly stated or corrected in the current utterance; never re-save unchanged city, BHK, or property type. Call updateRequirement at most once per user turn. Do not call getRequirementState after every update. Use resolveLocation only when location is genuinely ambiguous; do not call it for HSR, Koramangala, Indiranagar, Whitefield, or Electronic City. Once city, locality, property type, BHK, and budget are known, do not ask about optional details unless the caller volunteers them. Give one short summary, call finishRequirementCollection once, send at most three WhatsApp matches once, then call endCall. After calling endCall, generate no text. Never invent property details or delivery success. Never mention tools, IDs, credentials, or internal errors.',
     tools: tools
       ? [
           ...tools,
@@ -59,7 +60,7 @@ function createSession<UserData>(userData: UserData) {
       strictToolSchema: true,
       modelOptions: {
         temperature: 0.2,
-        max_completion_tokens: 72,
+        max_completion_tokens: 160,
         verbosity: 'low',
       },
     }),
@@ -70,7 +71,7 @@ function createSession<UserData>(userData: UserData) {
       modelOptions: { speed: 1.05, bit_rate: 128000 },
     }),
     userAwayTimeout: 15_000,
-    transcriptionTimeout: 8_000,
+    transcriptionTimeout: 3_500,
     maxToolSteps: 5,
     turnHandling: {
       turnDetection: new inference.TurnDetector(),
@@ -122,11 +123,59 @@ async function entry(
     roomName: ctx.room.name ?? 'unknown',
     callerIdentity: participant.identity,
   });
-  session.generateReply({
-    instructions: callContext
-      ? 'Say exactly one warm greeting in English: "Hi! Welcome to RentPe. What kind of property are you looking for?" Do not add anything else.'
-      : 'Briefly apologize in English, ask the caller to try again later, and end politely.',
+  let transcriptionRecoveryCount = 0;
+  let responseWatchdog: ReturnType<typeof setTimeout> | undefined;
+  session.on(AgentSessionEventTypes.UserInputTranscribed, (event) => {
+    if (!event.isFinal || event.transcript.trim().length < 2) return;
+    if (responseWatchdog) clearTimeout(responseWatchdog);
+    responseWatchdog = setTimeout(() => {
+      if (session.agentState === 'speaking') return;
+      console.warn(
+        JSON.stringify({ event: 'voice_empty_response_recovery_prompt' }),
+      );
+      try {
+        session.say('Got it. Which area and budget should I search for?', {
+          allowInterruptions: true,
+        });
+      } catch (error) {
+        console.warn('Unable to play empty response recovery prompt', error);
+      }
+    }, 5_000);
   });
+  session.on(AgentSessionEventTypes.AgentStateChanged, (event) => {
+    if (event.newState !== 'speaking') return;
+    if (responseWatchdog) clearTimeout(responseWatchdog);
+    responseWatchdog = undefined;
+  });
+  session.on(AgentSessionEventTypes.Close, () => {
+    if (responseWatchdog) clearTimeout(responseWatchdog);
+  });
+  session.on(AgentSessionEventTypes.UserTranscriptionTimeout, () => {
+    if (transcriptionRecoveryCount >= 2) return;
+    transcriptionRecoveryCount += 1;
+    console.warn(
+      JSON.stringify({
+        event: 'voice_transcription_recovery_prompt',
+        attempt: transcriptionRecoveryCount,
+      }),
+    );
+    try {
+      session.say(
+        "Sorry, I didn't quite catch that. Could you say that again?",
+        {
+          allowInterruptions: true,
+        },
+      );
+    } catch (error) {
+      console.warn('Unable to play transcription recovery prompt', error);
+    }
+  });
+  session.say(
+    callContext
+      ? 'Hi! Welcome to RentPe. What kind of property are you looking for?'
+      : 'Sorry, the property service is unavailable. Please try again later.',
+    { allowInterruptions: true },
+  );
 }
 
 export default defineAgent({ entry });
