@@ -27,6 +27,7 @@ export class DashboardAccountController {
   @Post() create(@Body() body: unknown) {
     return this.accounts.create(
       parseRequest(dashboardAccountCreateSchema, body),
+      'INVITED',
     );
   }
   @Patch(':id/status') updateStatus(

@@ -1,4 +1,5 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { timingSafeEqual } from 'node:crypto';
 import { parseRequest } from '../common/request.js';
 import { DatabaseService } from '../database/database.service.js';
 import { LocationResolutionService } from '../requirements/location-resolution.service.js';
@@ -54,7 +55,12 @@ export class VoiceToolsService {
 
   async invoke(request: VoiceToolRequest, token: string | undefined) {
     const expected = process.env.INTERNAL_API_TOKEN;
-    if (!expected || token !== expected)
+    if (
+      !expected ||
+      !token ||
+      expected.length !== token.length ||
+      !timingSafeEqual(Buffer.from(expected), Buffer.from(token))
+    )
       throw new UnauthorizedException('Invalid internal tool token');
     const data = await this.execute(request);
     return { ok: true, tool: request.tool, data } satisfies VoiceToolResponse;

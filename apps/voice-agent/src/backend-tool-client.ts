@@ -1,7 +1,8 @@
-import type {
-  VoiceToolRequest,
-  VoiceToolResponse,
-} from './voice-tool-contracts.js';
+import {
+  voiceToolResponseSchema,
+  type VoiceToolRequest,
+  type VoiceToolResponse,
+} from '@property-assistant/types';
 import type { BackendToolClient } from './contracts/agent-boundaries.js';
 
 const DEFAULT_TIMEOUT_MS = 4_000;
@@ -36,9 +37,9 @@ export class HttpBackendToolClient implements BackendToolClient {
         signal,
       },
     );
-    const body = (await response.json()) as VoiceToolResponse;
+    const raw = (await response.json()) as unknown;
     if (!response.ok)
       throw new Error(`Voice tool request failed with HTTP ${response.status}`);
-    return body;
+    return voiceToolResponseSchema.parse(raw);
   }
 }

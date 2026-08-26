@@ -5,7 +5,7 @@ import {
   requirementBatchUpdateSchema,
   voiceToolResponseSchema,
   type VoiceToolRequest,
-} from './voice-tool-contracts.js';
+} from '@property-assistant/types';
 import { z } from 'zod';
 import type { BackendToolClient } from './contracts/agent-boundaries.js';
 

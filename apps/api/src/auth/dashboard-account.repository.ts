@@ -21,7 +21,10 @@ export class DashboardAccountRepository {
       .orderBy('created_at', 'desc')
       .execute();
   }
-  create(input: DashboardAccountCreate) {
+  create(
+    input: DashboardAccountCreate,
+    status: 'INVITED' | 'ACTIVE' | 'SUSPENDED' = 'ACTIVE',
+  ) {
     return this.database.client
       .insertInto('dashboard_accounts')
       .values({
@@ -30,7 +33,7 @@ export class DashboardAccountRepository {
         display_name: input.displayName ?? null,
         phone: input.phone ?? null,
         role: input.role,
-        status: 'ACTIVE',
+        status,
         broker_id: input.brokerId ?? null,
       })
       .returningAll()

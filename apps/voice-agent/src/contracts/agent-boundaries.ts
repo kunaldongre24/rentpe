@@ -1,7 +1,7 @@
 import type {
   VoiceToolRequest,
   VoiceToolResponse,
-} from '../voice-tool-contracts.js';
+} from '@property-assistant/types';
 
 export interface VoiceAgentLifecycle {
   start(): Promise<void>;

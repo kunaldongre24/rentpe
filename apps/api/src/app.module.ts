@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { BrokersModule } from './brokers/brokers.module.js';
 
 import { ApiExceptionFilter } from './common/api-exception.filter.js';
@@ -24,6 +25,9 @@ import { WhatsAppModule } from './whatsapp/whatsapp.module.js';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ThrottlerModule.forRoot([
+      { name: 'default', ttl: 60_000, limit: 100 },
+    ]),
     DashboardModule,
     DatabaseModule,
     UsersModule,

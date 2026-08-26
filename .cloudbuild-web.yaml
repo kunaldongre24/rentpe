@@ -6,6 +6,16 @@ steps:
       - infra/docker/web.Dockerfile
       - -t
       - ${_IMAGE}
+      - --build-arg
+      - NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL}
+      - --build-arg
+      - NEXT_PUBLIC_SUPABASE_URL=${_NEXT_PUBLIC_SUPABASE_URL}
+      - --build-arg
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${_NEXT_PUBLIC_SUPABASE_ANON_KEY}
       - .
+substitutions:
+  _NEXT_PUBLIC_API_URL: http://localhost:3001
+  _NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+  _NEXT_PUBLIC_SUPABASE_ANON_KEY: not-configured
 images:
   - ${_IMAGE}

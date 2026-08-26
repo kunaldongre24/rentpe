@@ -9,7 +9,7 @@ import {
   voice,
 } from '@livekit/agents';
 import { fileURLToPath } from 'node:url';
-import { parseVoiceAgentEnvironment } from './agent-environment.js';
+import { parseVoiceAgentEnvironment } from '@property-assistant/config';
 import { HttpBackendToolClient } from './backend-tool-client.js';
 import { attachVoiceObservability } from './voice-observability.js';
 import {

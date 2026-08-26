@@ -5,7 +5,9 @@ import { AppModule } from './app.module.js';
 
 async function bootstrap(): Promise<void> {
   const environment = parseApiEnvironment(process.env);
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+  });
   app.enableShutdownHooks();
   app.enableCors({
     origin:
@@ -19,6 +21,11 @@ async function bootstrap(): Promise<void> {
   app.setGlobalPrefix('api');
   const port = Number(process.env.PORT ?? environment.API_PORT);
   await app.listen(port, environment.API_HOST);
+}
+
+export interface WebhookRequest {
+  headers: Record<string, string | string[] | undefined>;
+  rawBody: Buffer;
 }
 
 void bootstrap();

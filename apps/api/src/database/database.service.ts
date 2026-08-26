@@ -1,4 +1,9 @@
-import { Injectable, OnApplicationShutdown } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnApplicationShutdown,
+  OnModuleInit,
+} from '@nestjs/common';
 import {
   checkDatabase,
   createDatabase,
@@ -6,8 +11,15 @@ import {
 } from '@property-assistant/database';
 
 @Injectable()
-export class DatabaseService implements OnApplicationShutdown {
+export class DatabaseService implements OnModuleInit, OnApplicationShutdown {
+  private readonly logger = new Logger(DatabaseService.name);
   private clientInstance?: ReturnType<typeof createDatabase>;
+
+  async onModuleInit(): Promise<void> {
+    this.logger.log('Validating database connection at startup');
+    await this.check();
+    this.logger.log('Database connection verified');
+  }
 
   get client(): ReturnType<typeof createDatabase> {
     this.clientInstance ??= createDatabase(readDatabaseConfig(process.env));
