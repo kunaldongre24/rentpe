@@ -8,6 +8,7 @@ import {
   ServerOptions,
   voice,
 } from '@livekit/agents';
+import * as sarvam from '@livekit/agents-plugin-sarvam';
 import { fileURLToPath } from 'node:url';
 import { parseVoiceAgentEnvironment } from '@property-assistant/config';
 import { HttpBackendToolClient } from './backend-tool-client.js';
@@ -45,14 +46,10 @@ function createAgent<UserData>(
 function createSession<UserData>(userData: UserData) {
   return new voice.AgentSession<UserData>({
     userData,
-    stt: new inference.STT({
-      model: 'assemblyai/u3-rt-pro',
-      language: 'en',
-      modelOptions: {
-        mode: 'min_latency',
-        agent_context:
-          'Indian property calls; RentPe, HSR Layout, Bengaluru, Bangalore, BHK, rent, furnishing, parking, 14th Main',
-      },
+    stt: new sarvam.STT({
+      model: 'saaras:v3',
+      languageCode: 'en-IN',
+      mode: 'transcribe',
     }),
     llm: new inference.LLM({
       model: 'google/gemini-3-flash',
@@ -64,11 +61,13 @@ function createSession<UserData>(userData: UserData) {
         verbosity: 'low',
       },
     }),
-    tts: new inference.TTS({
-      model: 'xai/tts-1',
-      voice: 'naksh',
-      language: 'en',
-      modelOptions: { speed: 1.05, bit_rate: 128000 },
+    tts: new sarvam.TTS({
+      model: 'bulbul:v3',
+      speaker: 'shubh',
+      targetLanguageCode: 'en-IN',
+      pace: 1.05,
+      temperature: 0.7,
+      sampleRate: 22050,
     }),
     userAwayTimeout: 15_000,
     transcriptionTimeout: 3_500,
