@@ -8,6 +8,7 @@ describe('production environment hardening', () => {
         NODE_ENV: 'production',
         INTERNAL_API_TOKEN: 'replace-with-a-long-random-development-token',
         SARVAM_API_KEY: 'test-key',
+        ELEVEN_API_KEY: 'test-key',
       }),
     ).toThrow();
   });
@@ -18,6 +19,7 @@ describe('production environment hardening', () => {
         NODE_ENV: 'production',
         INTERNAL_API_TOKEN: 'a'.repeat(32),
         SARVAM_API_KEY: 'test-key',
+        ELEVEN_API_KEY: 'test-key',
       }).INTERNAL_API_TOKEN,
     ).toHaveLength(32);
   });

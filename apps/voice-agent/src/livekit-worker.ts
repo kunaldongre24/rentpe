@@ -8,6 +8,7 @@ import {
   ServerOptions,
   voice,
 } from '@livekit/agents';
+import * as elevenlabs from '@livekit/agents-plugin-elevenlabs';
 import * as sarvam from '@livekit/agents-plugin-sarvam';
 import { fileURLToPath } from 'node:url';
 import { parseVoiceAgentEnvironment } from '@property-assistant/config';
@@ -61,13 +62,12 @@ function createSession<UserData>(userData: UserData) {
         verbosity: 'low',
       },
     }),
-    tts: new sarvam.TTS({
-      model: 'bulbul:v3',
-      speaker: 'shubh',
-      targetLanguageCode: 'en-IN',
-      pace: 1.05,
-      temperature: 0.7,
-      sampleRate: 22050,
+    tts: new elevenlabs.TTS({
+      voiceId: 'iP95p4xoKVk53GoZ742B',
+      model: 'eleven_multilingual_v2',
+      language: 'en',
+      streamingLatency: 3,
+      chunkLengthSchedule: [80, 120, 200, 260],
     }),
     userAwayTimeout: 15_000,
     transcriptionTimeout: 3_500,

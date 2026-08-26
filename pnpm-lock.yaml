@@ -102,6 +102,9 @@ importers:
       '@livekit/agents':
         specifier: ^1.7.0
         version: 1.7.0(@livekit/rtc-node@0.13.34)(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3)
+      '@livekit/agents-plugin-elevenlabs':
+        specifier: ^1.7.0
+        version: 1.7.0(@livekit/agents@1.7.0(@livekit/rtc-node@0.13.34)(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3))(@livekit/rtc-node@0.13.34)
       '@livekit/agents-plugin-sarvam':
         specifier: ^1.7.0
         version: 1.7.0(@livekit/agents@1.7.0(@livekit/rtc-node@0.13.34)(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3))(@livekit/rtc-node@0.13.34)
@@ -947,6 +950,12 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@livekit/agents-plugin-elevenlabs@1.7.0':
+    resolution: {integrity: sha512-eMeYaUlJ0vd6baQlJS2GP8jWO/j5jOGLf3aZl2+6tUBmLiUiGL3284hhD3N60JX+pF/kDEKGFoI6/w/OiUSjPg==}
+    peerDependencies:
+      '@livekit/agents': 1.7.0
+      '@livekit/rtc-node': ^0.13.34
 
   '@livekit/agents-plugin-sarvam@1.7.0':
     resolution: {integrity: sha512-rB1SAz57o3fvwdO4btbGG4PBZWadgO4E+1BtcsF0tnNdplOb8qQVEVs7pWiWRtr+hHt2P5GCMeVvg8rTf3TwTQ==}
@@ -5016,6 +5025,16 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@livekit/agents-plugin-elevenlabs@1.7.0(@livekit/agents@1.7.0(@livekit/rtc-node@0.13.34)(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3))(@livekit/rtc-node@0.13.34)':
+    dependencies:
+      '@livekit/agents': 1.7.0(@livekit/rtc-node@0.13.34)(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3)
+      '@livekit/mutex': 1.1.1
+      '@livekit/rtc-node': 0.13.34
+      ws: 8.21.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@livekit/agents-plugin-sarvam@1.7.0(@livekit/agents@1.7.0(@livekit/rtc-node@0.13.34)(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3))(@livekit/rtc-node@0.13.34)':
     dependencies:
