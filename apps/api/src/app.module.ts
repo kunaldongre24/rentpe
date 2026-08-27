@@ -17,10 +17,10 @@ import { ConversationsModule } from './conversations/conversations.module.js';
 import { PreferencesModule } from './preferences/preferences.module.js';
 import { PropertiesModule } from './properties/properties.module.js';
 import { SearchModule } from './searches/search.module.js';
-import { RequirementsModule } from './requirements/requirements.module.js';
 import { UsersModule } from './users/users.module.js';
 import { VoiceModule } from './voice/voice.module.js';
 import { WhatsAppModule } from './whatsapp/whatsapp.module.js';
+import { VobizModule } from './vobiz/vobiz.module.js';
 
 @Module({
   imports: [
@@ -33,6 +33,7 @@ import { WhatsAppModule } from './whatsapp/whatsapp.module.js';
     UsersModule,
     VoiceModule,
     WhatsAppModule,
+    VobizModule,
     LocationsModule,
     BrokersModule,
     SearchModule,
@@ -40,7 +41,6 @@ import { WhatsAppModule } from './whatsapp/whatsapp.module.js';
     PreferencesModule,
     PropertiesModule,
     NotificationsModule,
-    RequirementsModule,
     FeedbackModule,
     HealthModule,
   ],

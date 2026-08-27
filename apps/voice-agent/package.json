@@ -9,8 +9,8 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "dev": "tsx watch src/livekit-worker.ts",
-    "start": "node dist/livekit-worker.js start",
+    "dev": "node --env-file=../../.env --import tsx/esm src/livekit-worker.ts dev",
+    "start": "node --env-file=../../.env dist/livekit-worker.js start",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

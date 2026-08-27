@@ -35,6 +35,8 @@ printf '%s' 'LIVEKIT_API_KEY' | gcloud secrets create projectx-livekit-api-key -
 printf '%s' 'LIVEKIT_API_SECRET' | gcloud secrets create projectx-livekit-api-secret --data-file=-
 printf '%s' 'GUPSHUP_API_KEY' | gcloud secrets create projectx-gupshup-api-key --data-file=-
 printf '%s' 'GUPSHUP_SOURCE' | gcloud secrets create projectx-gupshup-source --data-file=-
+printf '%s' 'YOUR_SARVAM_API_KEY' | gcloud secrets create projectx-sarvam-api-key --data-file=-
+printf '%s' 'YOUR_ELEVEN_API_KEY' | gcloud secrets create projectx-eleven-api-key --data-file=-
 ```
 
 Use the direct Supabase database URL for migrations. Do not use a browser-visible Supabase key in the API or web service. Grant the Cloud Run runtime service account `roles/secretmanager.secretAccessor` on these secrets.
@@ -110,9 +112,33 @@ Configure the LiveKit worker with these runtime values in Secret Manager:
 - `LIVEKIT_URL`
 - `LIVEKIT_API_KEY`
 - `LIVEKIT_API_SECRET`
+- `SARVAM_API_KEY` — speech-to-text (Sarvam AI)
+- `ELEVEN_API_KEY` — text-to-speech (ElevenLabs)
 - `INTERNAL_API_URL` set to the deployed API URL
 - `INTERNAL_API_TOKEN`
 - WhatsApp provider secrets required by the API, not the worker
+
+Deploy the voice worker (persistent, cannot scale to zero):
+
+```bash
+gcloud run deploy projectx-voice-agent \
+  --image=$REPO/voice-agent:latest \
+  --region=$REGION \
+  --service-account=projectx-runtime@$PROJECT_ID.iam.gserviceaccount.com \
+  --update-secrets=SARVAM_API_KEY=projectx-sarvam-api-key:latest,ELEVEN_API_KEY=projectx-eleven-api-key:latest,LIVEKIT_URL=projectx-livekit_url:latest,LIVEKIT_API_KEY=projectx-livekit_api_key:latest,LIVEKIT_API_SECRET=projectx-livekit_api_secret:latest,INTERNAL_API_URL=projectx-internal-api-url:latest,INTERNAL_API_TOKEN=projectx-internal-api-token:latest \
+  --min-instances=1 \
+  --max-instances=1 \
+  --port=8080 \
+  --no-traffic
+```
+
+Route traffic after verifying the revision:
+
+```bash
+gcloud run services update-traffic projectx-voice-agent --region=$REGION --to-latest
+```
+
+A convenience script is available at `scripts/deploy-voice-agent.sh` (bash) and `scripts/deploy-voice-agent.ps1` (PowerShell).
 
 The voice-agent image uses Debian-based `node:24-slim` because LiveKit's native RTC bindings require glibc; Alpine/musl images fail to load the Linux native module. Deploy the worker with the image's direct Node entrypoint (`/app/apps/voice-agent/dist/livekit-worker.js start`) rather than invoking pnpm at runtime.
 

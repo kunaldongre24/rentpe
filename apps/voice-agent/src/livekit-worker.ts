@@ -21,7 +21,9 @@ import {
   type CallContext,
 } from './livekit-tools.js';
 
-const agentName = 'projectx-voice-agent';
+const agentName = 'rentpe-voice-agent';
+
+console.log(`[voice-agent] worker process started (agent=${agentName})`);
 
 type CallSessionData = CallContext | { initializing: true };
 
@@ -93,6 +95,7 @@ async function entry(
   ctx: Parameters<NonNullable<ReturnType<typeof defineAgent>['entry']>>[0],
 ) {
   const environment = parseVoiceAgentEnvironment(process.env);
+  console.log(`[voice-agent] connected to LiveKit room ${ctx.room.name ?? 'unknown'}`);
   const backend = new HttpBackendToolClient(
     new URL(environment.INTERNAL_API_URL),
     environment.INTERNAL_API_TOKEN,
@@ -180,5 +183,9 @@ async function entry(
 export default defineAgent({ entry });
 
 cli.runApp(
-  new ServerOptions({ agent: fileURLToPath(import.meta.url), agentName }),
+  new ServerOptions({
+    agent: fileURLToPath(import.meta.url),
+    agentName,
+    port: Number(process.env.PORT) || 8081,
+  }),
 );

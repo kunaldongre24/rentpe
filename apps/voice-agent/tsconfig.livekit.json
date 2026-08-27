@@ -7,7 +7,13 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "paths": {
+      "@property-assistant/config": ["./src/stubs/config.ts"],
+      "@property-assistant/config/*": ["./src/stubs/config.ts"],
+      "@property-assistant/types": ["./src/stubs/types.ts"],
+      "@property-assistant/types/*": ["./src/stubs/types.ts"]
+    }
   },
-  "include": ["src/livekit-worker.ts"]
+  "include": ["src/livekit-worker.ts", "src/stubs/config.ts", "src/stubs/types.ts"]
 }
