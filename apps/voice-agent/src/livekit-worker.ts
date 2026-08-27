@@ -95,7 +95,9 @@ async function entry(
   ctx: Parameters<NonNullable<ReturnType<typeof defineAgent>['entry']>>[0],
 ) {
   const environment = parseVoiceAgentEnvironment(process.env);
-  console.log(`[voice-agent] connected to LiveKit room ${ctx.room.name ?? 'unknown'}`);
+  console.log(
+    `[voice-agent] connected to LiveKit room ${ctx.room.name ?? 'unknown'}`,
+  );
   const backend = new HttpBackendToolClient(
     new URL(environment.INTERNAL_API_URL),
     environment.INTERNAL_API_TOKEN,

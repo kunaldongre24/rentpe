@@ -43,8 +43,7 @@ function money(value: string | number) {
 }
 
 export function PropertyCards({ rows }: { rows: Property[] }) {
-  if (!rows.length)
-    return <div className="inline-empty">No records yet</div>;
+  if (!rows.length) return <div className="inline-empty">No records yet</div>;
   return (
     <div className="property-cards">
       {rows.map((item) => (

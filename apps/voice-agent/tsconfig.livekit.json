@@ -15,5 +15,9 @@
       "@property-assistant/types/*": ["./src/stubs/types.ts"]
     }
   },
-  "include": ["src/livekit-worker.ts", "src/stubs/config.ts", "src/stubs/types.ts"]
+  "include": [
+    "src/livekit-worker.ts",
+    "src/stubs/config.ts",
+    "src/stubs/types.ts"
+  ]
 }

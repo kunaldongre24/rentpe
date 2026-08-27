@@ -50,7 +50,7 @@ export class VobizWebhookController {
     // 2. Create a participant for the caller (using caller's phone number as identity)
     // 3. Return room details so the caller can join
     // 4. The voice agent in that room would handle the conversation
-    
+
     // For now, return room info that the frontend/caller can use
     // The voice agent will need to be configured to join this room
     this.logger.log(`Vobiz SIP authentication succeeded. Room: ${roomName}`);
@@ -74,9 +74,9 @@ export class VobizWebhookController {
 
     // Simple validation: check if the auth header contains the expected username
     // In production, you'd implement proper SIP digest authentication validation
-    const authValid = authHeader.toLowerCase().includes(
-      this.vobizSipUsername.toLowerCase(),
-    );
+    const authValid = authHeader
+      .toLowerCase()
+      .includes(this.vobizSipUsername.toLowerCase());
 
     // Additional check: verify the DID matches (sent as custom header)
     const didHeader = req.headers['x-vobiz-did'] as string | undefined;

@@ -124,8 +124,7 @@ export function Properties({
                   </td>
                   <td>{money(item.rent)}</td>
                   <td>
-                    {item.bhk} BHK \u00B7{' '}
-                    {item.furnishing.replaceAll('_', ' ')}
+                    {item.bhk} BHK \u00B7 {item.furnishing.replaceAll('_', ' ')}
                   </td>
                   <td>
                     <StatusBadge value={item.status} />

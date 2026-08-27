@@ -25,9 +25,7 @@ import { VobizModule } from './vobiz/vobiz.module.js';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    ThrottlerModule.forRoot([
-      { name: 'default', ttl: 60_000, limit: 100 },
-    ]),
+    ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 100 }]),
     DashboardModule,
     DatabaseModule,
     UsersModule,
