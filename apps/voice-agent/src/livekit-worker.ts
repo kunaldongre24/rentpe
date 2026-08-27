@@ -65,7 +65,7 @@ function createSession<UserData>(userData: UserData) {
       },
     }),
     tts: new elevenlabs.TTS({
-      voiceId: '2EiwWnXFnvU5JabP6VDI', // Indian English male - RentPe consultant (warm North Indian accent)
+      voiceId: 'oO7sLA3dWfQXsKeSAjpA', // Sia - Indian English female
       model: 'eleven_multilingual_v2',
       language: 'en',
       streamingLatency: 3,

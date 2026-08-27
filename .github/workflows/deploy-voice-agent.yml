@@ -1,0 +1,57 @@
+name: Deploy Voice Agent (LiveKit Cloud)
+
+# Manual dispatch only. To deploy:
+#   1. Add the required repository secrets (see the "Required secrets" table in the
+#      workflow / repo settings).
+#   2. Run this workflow from the Actions tab -> "Run workflow".
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: voice-agent-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
+      LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
+      LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Install LiveKit CLI
+        run: go install github.com/livekit/livekit-cli/cmd/lk@v2.18.2
+
+      - name: Build voice-agent image
+        working-directory: apps/voice-agent
+        run: docker build --build-arg NODE_VERSION=24 -f Dockerfile -t rentpe-voice-agent:latest .
+
+      - name: Deploy to LiveKit Cloud Agent
+        working-directory: apps/voice-agent
+        env:
+          # Provider + API runtime secrets injected into the agent container.
+          GH_ELEVEN_API_KEY: ${{ secrets.ELEVEN_API_KEY }}
+          GH_SARVAM_API_KEY: ${{ secrets.SARVAM_API_KEY }}
+          GH_INTERNAL_API_URL: ${{ secrets.INTERNAL_API_URL }}
+          GH_INTERNAL_API_TOKEN: ${{ secrets.INTERNAL_API_TOKEN }}
+        run: |
+          "$HOME/go/bin/lk" agent deploy \
+            --project rentpe-proj \
+            --region ap-south \
+            --image rentpe-voice-agent:latest \
+            --secrets "ELEVEN_API_KEY=${GH_ELEVEN_API_KEY},SARVAM_API_KEY=${GH_SARVAM_API_KEY},INTERNAL_API_URL=${GH_INTERNAL_API_URL},INTERNAL_API_TOKEN=${GH_INTERNAL_API_TOKEN},LIVEKIT_URL=${LIVEKIT_URL},LIVEKIT_API_KEY=${LIVEKIT_API_KEY},LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}" \
+            -y
+
+      - name: Verify agent status
+        run: |
+          "$HOME/go/bin/lk" agent status --id CA_cV2fUZr4Ayfv --project rentpe-proj
