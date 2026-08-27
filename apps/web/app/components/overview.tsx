@@ -79,6 +79,15 @@ export function PropertyCards({ rows }: { rows: Property[] }) {
   );
 }
 
+type Section =
+  | 'Overview'
+  | 'Properties'
+  | 'Add listing'
+  | 'Brokers'
+  | 'Calls'
+  | 'Searches'
+  | 'Users';
+
 export function Overview({
   data,
   setActive,
@@ -89,7 +98,7 @@ export function Overview({
     calls: Entity[];
     searches: Entity[];
   };
-  setActive: (value: string) => void;
+  setActive: (value: Section) => void;
 }) {
   const activeProperties = data.properties.filter(
     (item) => item.status === 'ACTIVE',
