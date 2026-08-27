@@ -1,6 +1,7 @@
 import { Body, Req, Controller, Logger, Post } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { vobizWebhookSchema } from '../common/vobiz-webhook.schema.js';
+import type { VobizWebhook } from '../common/vobiz-webhook.schema.js';
 import { parseRequest } from '../common/request.js';
 import type { WebhookRequest } from '../main.js';
 
@@ -19,7 +20,7 @@ export class VobizWebhookController {
   receive(@Req() req: WebhookRequest, @Body() body: unknown) {
     this.logger.log('Received vobiz webhook');
 
-    const webhook = parseRequest(vobizWebhookSchema, body);
+    const webhook: VobizWebhook = parseRequest(vobizWebhookSchema, body);
 
     // Extract call information
     const { did, caller, callSid } = webhook;

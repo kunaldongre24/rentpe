@@ -43,11 +43,16 @@ function normalizeIndianPhone(value: string | undefined): string | undefined {
   return e164PhoneSchema.safeParse(candidate).success ? candidate : undefined;
 }
 
-export function getCallerPhone(participant: CallerParticipant): string {
+export function getCallerPhone(
+  participant: CallerParticipant,
+  roomName?: string,
+): string {
   const attributeCandidates = [
     participant.attributes['sip.phoneNumber'],
     participant.attributes['sip.callerPhoneNumber'],
     participant.attributes['sip.from'],
+    participant.attributes['callerId'],
+    participant.attributes['phoneNumber'],
   ];
   for (const candidate of attributeCandidates) {
     const phone = normalizeIndianPhone(candidate);
@@ -55,9 +60,18 @@ export function getCallerPhone(participant: CallerParticipant): string {
   }
 
   const identity = participant.identity.replace(/^sip[_:-]/i, '');
-  const phone = normalizeIndianPhone(identity);
-  if (!phone) throw new Error('SIP caller phone number is unavailable');
-  return phone;
+  let phone = normalizeIndianPhone(identity);
+  if (phone) return phone;
+
+  if (roomName) {
+    const match = roomName.match(/(\+?91\d{10}|\d{10})/);
+    if (match?.[1]) {
+      phone = normalizeIndianPhone(match[1]);
+      if (phone) return phone;
+    }
+  }
+
+  throw new Error('SIP caller phone number is unavailable');
 }
 
 export async function initializeCallContext(
