@@ -16,7 +16,7 @@ export class VobizWebhookController {
   constructor() {}
 
   @Post()
-  async receive(@Req() req: WebhookRequest, @Body() body: unknown) {
+  receive(@Req() req: WebhookRequest, @Body() body: unknown) {
     this.logger.log('Received vobiz webhook');
 
     const webhook = parseRequest(vobizWebhookSchema, body);

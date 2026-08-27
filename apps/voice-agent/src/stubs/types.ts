@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */
 export const voiceToolRequestSchema = {} as any;
 export const voiceToolResponseSchema = {} as any;
 export const locationResolveSchema = {} as any;
