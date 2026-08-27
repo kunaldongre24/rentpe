@@ -1,9 +1,5 @@
 name: Deploy Voice Agent (LiveKit Cloud)
 
-# Manual dispatch only. To deploy:
-#   1. Add the required repository secrets (see the "Required secrets" table in the
-#      workflow / repo settings).
-#   2. Run this workflow from the Actions tab -> "Run workflow".
 on:
   workflow_dispatch:
 
@@ -24,13 +20,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.24'
-
       - name: Install LiveKit CLI
-        run: go install github.com/livekit/livekit-cli/cmd/lk@v2.18.2
+        run: |
+          set -e
+          LK_VERSION=2.18.3
+          curl -fsSL -o /tmp/lk.tar.gz \
+            "https://github.com/livekit/livekit-cli/releases/download/v${LK_VERSION}/lk_${LK_VERSION}_linux_amd64.tar.gz"
+          mkdir -p "$HOME/.local/bin"
+          tar -xzf /tmp/lk.tar.gz -C "$HOME/.local/bin"
+          chmod +x "$HOME/.local/bin/lk"
+          "$HOME/.local/bin/lk" --version
 
       - name: Build voice-agent image
         working-directory: apps/voice-agent
@@ -45,7 +44,7 @@ jobs:
           GH_INTERNAL_API_URL: ${{ secrets.INTERNAL_API_URL }}
           GH_INTERNAL_API_TOKEN: ${{ secrets.INTERNAL_API_TOKEN }}
         run: |
-          "$HOME/go/bin/lk" agent deploy \
+          "$HOME/.local/bin/lk" agent deploy \
             --project rentpe-proj \
             --region ap-south \
             --image rentpe-voice-agent:latest \
@@ -54,4 +53,4 @@ jobs:
 
       - name: Verify agent status
         run: |
-          "$HOME/go/bin/lk" agent status --id CA_cV2fUZr4Ayfv --project rentpe-proj
+          "$HOME/.local/bin/lk" agent status --id CA_cV2fUZr4Ayfv --project rentpe-proj
