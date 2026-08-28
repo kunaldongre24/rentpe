@@ -23,6 +23,19 @@ import {
 
 const agentName = 'rentpe-voice-agent';
 
+process.on('unhandledRejection', (reason) => {
+  if (reason instanceof Error && reason.message.includes('runner initialization timed out')) {
+    console.warn(
+      JSON.stringify({
+        event: 'voice_runner_init_timeout',
+        message: 'LiveKit runner initialization timed out; keeping worker alive',
+      }),
+    );
+    return;
+  }
+  console.error('Unhandled rejection in voice worker', reason);
+});
+
 console.log(`[voice-agent] worker process started (agent=${agentName})`);
 
 type CallSessionData = CallContext | { initializing: true };
@@ -189,5 +202,6 @@ cli.runApp(
     agent: fileURLToPath(import.meta.url),
     agentName,
     port: Number(process.env.PORT) || 8081,
+    initializeProcessTimeout: 120_000,
   }),
 );
