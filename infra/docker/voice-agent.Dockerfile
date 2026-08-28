@@ -17,4 +17,4 @@ RUN corepack enable && corepack prepare pnpm@10.15.0 --activate && \
 WORKDIR /app
 COPY --from=build --chown=app:app /app /app
 USER app
-CMD ["node", "/app/apps/voice-agent/dist/cloud-run-entrypoint.js"]
+CMD ["node", "/app/apps/voice-agent/dist/livekit-worker.js", "start"]
