@@ -49,7 +49,6 @@ jobs:
             --region "${REGION}" \
             --image "${IMAGE}" \
             --port 8080 \
-            --set-env-vars=PORT=8080 \
             --cpu 2 \
             --memory 1024Mi \
             --min-instances 1 \
